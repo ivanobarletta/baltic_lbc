@@ -167,7 +167,7 @@ def makeBoxAverageProfile(dscoords=None
 
     # retrieve mask, reorder shape and invert x axis
 
-                                                       #shap x,y axes  # reverse along x         
+                                                       #swap x,y axes  # reverse along x         
     mask3D = np.swapaxes(dsmask["mask"].isel(time_counter=0).data,1,2)[:,::-1,:]
 
     # use the mask to mask variables
@@ -201,8 +201,8 @@ def makeBoxAverageProfile(dscoords=None
     ax1.set_ylim(dmaxx,dminn)
     ax1.grid(linestyle="-",linewidth=1)
     ax1.legend()
-    ax1.set_title(date_str)
-    ax1.set_xlabel("%s[%s]" % (varname,variables[0].units))
+    ax1.set_title(date2)
+    ax1.set_xlabel("%s [%s]" % (varname,variables[0].units),fontsize=15)
     ax1.yaxis.tick_right()
     ax1.yaxis.set_label_position("right")
     ax1.set_ylabel("Depth[m]")
@@ -218,4 +218,10 @@ listOfDs    = [dsSIREN,dsCDO,dsXESMF,dsCDOGlo]
 listOfLabels = ["GLO(Siren)","BAL(CDO)","BAL(xESMF","GLO(CDO)"]
 
 makeBoxAverageProfile(dscoords=dsCoords,ds_list=listOfDs,varname="votemper",date_str="20220105",dsmask=dsTMASK,dminn=0,dmaxx=50,label_list=listOfLabels,box=indexBox)
+
+makeBoxAverageProfile(dscoords=dsCoords,ds_list=listOfDs,varname="votemper",date_str="20220701",dsmask=dsTMASK,dminn=0,dmaxx=50,label_list=listOfLabels,box=indexBox)
+makeBoxAverageProfile(dscoords=dsCoords,ds_list=listOfDs,varname="vosaline",date_str="20220701",dsmask=dsTMASK,dminn=0,dmaxx=50,label_list=listOfLabels,box=indexBox)
+
+makeBoxAverageProfile(dscoords=dsCoords,ds_list=listOfDs,varname="votemper",date_str="20230701",dsmask=dsTMASK,dminn=0,dmaxx=50,label_list=listOfLabels,box=indexBox)
+makeBoxAverageProfile(dscoords=dsCoords,ds_list=listOfDs,varname="vosaline",date_str="20230701",dsmask=dsTMASK,dminn=0,dmaxx=50,label_list=listOfLabels,box=indexBox)
 
