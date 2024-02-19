@@ -3,12 +3,13 @@ import xarray as xr
 import numba as np 
 import os
 
-varname         = "votemper"
 varname         = "vosaline"
-indexBox        = [3,13,31,41]
-zindex          = 5 
+varname         = "votemper"
 
-rootFolder      = "../lbc_files_concatenated"
+indexBox        = [3,13,31,41]
+zindex          = 10 
+
+rootFolder      = "../../lbc_files_concatenated"
 
 pathSiren       = "NEATL36_obcdta_east2_2022-2023.nc"
 pathCDO_GLO     = "NEATL36_east2_CDO_GLO_2022-2023.nc"
@@ -45,7 +46,7 @@ plt.plot(timeCDO_BAL    ,timeSeriesCDO_BAL  ,label="BAL-CMEMS (CDO)"    ,linesty
 plt.plot(timeXESMF_BAL  ,timeSeriesXESMF_BAL,label="BAL-CMEMS (xESMF)"  ,linestyle="dashdot",color="g")
 plt.plot(timeCDO_GLO    ,timeSeriesCDO_GLO  ,label="GLO-CMEMS (CDO)"    ,linestyle="dotted" ,color="0.3")
 plt.grid()
-plt.ylabel("box averaged [%s] - Z %5.2f m" % (varname,deptht.isel(Z=zindex).data), fontsize=15)
+plt.ylabel("box averaged [%s] - Depth: %5.2f m" % (varname,deptht.isel(Z=zindex).data), fontsize=15)
 plt.legend()
 
 figname = "box_average_%s_z_%s" % (varname,zindex)
