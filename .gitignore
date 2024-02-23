@@ -2,6 +2,5 @@
 *.pyc
 *.png
 *nc_save
-*.pptx
 
 __pycache__
