@@ -10,16 +10,16 @@ import warnings
 	meaning of the box list
 
 	-----------------------------	- box[3]			^
-	|							|						|
-	|							|						|
-	|							|						|
-	|							|	lat				lat average
-	|							|						|
-	|							|						|
+	|			    |					|
+	|			    |					|
+	|			    |					|
+	|			    |	lat				lat average
+	|			    |					|
+	|			    |					|
 	-----------------------------	- box[2]			v
-	|							|
+	|			    |
 
-	box[0]		lon				box[1]					
+	box[0]		lon	  box[1]					
 
 	the script computes seasonal climatologies of
 	2 cmems datatasets and a spatial average along latitude
@@ -31,24 +31,24 @@ import warnings
 	and transect plots are displayed, showing the input variable
 	and the (u,w) velocity field overlapped as quiver
 
-			ds1			ds2
+		   ds1		   ds2
 		---------	---------
-	DJF	|		|	|		|	depth
-		|		|	|		|
-		---------	---------
-		---------	---------
-	MAM	|		|	|		|	depth
-		|		|	|		|
+	DJF	|	|	|	|	depth
+		|	|	|	|
 		---------	---------
 		---------	---------
-	JJA	|		|	|		|	depth
-		|		|	|		|
+	MAM	|	|	|	|	depth
+		|	|	|	|
 		---------	---------
 		---------	---------
-	SON	|		|	|		|	depth
-		|		|	|		|
+	JJA	|	|	|	|	depth
+		|	|	|	|
 		---------	---------
-			lon			lon
+		---------	---------
+	SON	|	|	|	|	depth
+		|	|	|	|
+		---------	---------
+		   lon		  lon
 
 """
 
