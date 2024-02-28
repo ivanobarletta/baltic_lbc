@@ -260,9 +260,11 @@ def make_1_2x1plot2(dsCoords=None
 
     nav_lon,nav_lat = dsCoords["nav_lon"],dsCoords["nav_lat"]
 
+    nx = dsCoords.sizes["x"]	
+
     # plot coordinates and transect line (LEFT axes)
     ax[0].scatter(nav_lon,nav_lat,s=0.5,color="k")
-    ax[0].plot(nav_lon.isel(x=-1),nav_lat.isel(x=-1),color="b",linewidth=1)
+    ax[0].plot(nav_lon.isel(x=nx-xidx-1),nav_lat.isel(x=nx-xidx-1),color="b",linewidth=1)
 
     # determine time index to load from date 
     date2   = "%s-%s-%sT12" % (date_str[:4],date_str[4:6],date_str[6:])
@@ -286,7 +288,7 @@ def make_1_2x1plot2(dsCoords=None
         raise Exception("problems with fetching the time index")
 
     if dsmask != None:
-        maskzy = dsmask["mask"].isel(time_counter=0,x=-1)
+        maskzy = dsmask["mask"].isel(time_counter=0,x=nx-xidx-1)
         var1.data = var1.data * maskzy.data
         var2.data = var2.data * maskzy.data
     deptht = ds1["deptht"]
