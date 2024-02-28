@@ -9,17 +9,17 @@ import warnings
 
 	meaning of the box list
 
-	-----------------------------	- box[3]			^
-	|			    |					|
-	|			    |					|
-	|			    |					|
-	|			    |	lat				lat average
-	|			    |					|
-	|			    |					|
-	-----------------------------	- box[2]			v
-	|			    |
+	-----------------------------	- box[3]		^
+	|                           |					|
+	|                           |					|
+	|			                |					|
+	|                           |	lat				lat average
+	|                           |					|
+	|			                |					|
+	-----------------------------	- box[2]		v
+	|			                |
 
-	box[0]		lon	  box[1]					
+	box[0]		lon	         box[1]					
 
 	the script computes seasonal climatologies of
 	2 cmems datatasets and a spatial average along latitude
@@ -33,20 +33,20 @@ import warnings
 
 		   ds1		   ds2
 		---------	---------
-	DJF	|	|	|	|	depth
-		|	|	|	|
+	DJF	|	    |	|	    |	depth
+		|	    |	|	    |
 		---------	---------
 		---------	---------
-	MAM	|	|	|	|	depth
-		|	|	|	|
+	MAM	|	    |	|	    |	depth
+		|	    |	|	    |
 		---------	---------
 		---------	---------
-	JJA	|	|	|	|	depth
-		|	|	|	|
+	JJA	|	    |	|	    |	depth
+		|	    |	|	    |
 		---------	---------
 		---------	---------
-	SON	|	|	|	|	depth
-		|	|	|	|
+	SON	|	    |	|	    |	depth
+		|	    |	|	    |
 		---------	---------
 		   lon		  lon
 
