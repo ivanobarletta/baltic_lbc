@@ -20,6 +20,9 @@ props = dict(boxstyle='round', facecolor='wheat', alpha=0.5)
 kw={"fill_value": "extrapolate"}
 
 dates   = [datetime(2022,9,29)]
+
+dates   = [datetime(2022,4,1),datetime(2022,7,29),datetime(2022,9,28),datetime(2022,8,25),datetime(2023,8,7)]
+
 depths  = [0,40]
 
 proj_plot   = ccrs.PlateCarree()
@@ -53,8 +56,12 @@ for t in range(len(dates)):
         ax[d,0].coastlines(resolution='10m')
         ax[d,1].coastlines(resolution='10m')
 
+        umod = np.sqrt(ds_glo.isel(time=t,depth=d).uo**2 + ds_glo.isel(time=t,depth=d).vo**2).data
         ds_glo.isel(time=t,depth=d).plot.streamplot(ax=ax[d,0],transform=projj,x="longitude",y="latitude",u="uo",v="vo",density=1,linewidth=0.2)
+        cf = ax[d,0].contourf(ds_glo.longitude,ds_glo.latitude,umod,vmin=0,vmax=0.5,transform=projj)
+        umod = np.sqrt(ds_bal.isel(time=t,depth=d).uo**2 + ds_bal.isel(time=t,depth=d).vo**2).data
         ds_bal.isel(time=t,depth=d).plot.streamplot(ax=ax[d,1],transform=projj,x="lon",y="lat",u="uo",v="vo",density=1,linewidth=0.2)
+        cf = ax[d,1].contourf(ds_bal.lon,ds_bal.lat,umod,vmin=0,vmax=0.5,transform=projj)
 
         #ds_glo.isel(time=t,depth=d).plot.streamplot(ax=ax[d,0],x="longitude",y="latitude",u="uo",v="vo"
         #                                            ,density=3,linewidth=0.2,color="k",transform=ccrs.PlateCarree())
@@ -96,4 +103,4 @@ for t in range(len(dates)):
 
     plt.savefig(os.path.join(outFolder,figname))
 
-plt.show()
+#plt.show()
