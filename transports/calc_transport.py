@@ -196,19 +196,19 @@ def loadDatasetsNoDuplicates(rootPath="rootPath",rootFileName="rootFileName"):
     # subset fileList 
     fileListSubset = np.asarray(fileList)[df2.index].tolist()
 
-    f = open("subset.dat","w")
-    for file in fileListSubset:
-        f.write(file+"\n")
-    f.close()
+    #f = open("subset.dat","w")
+    #for file in fileListSubset:
+    #    f.write(file+"\n")
+    #f.close()
 
 
     # load mfdataset
     ds = xr.open_mfdataset(fileListSubset,combine="nested",concat_dim="T")
 
-    print(ds.compute())
-    print()
-    for dd in ds.compute().time_counter:
-        print(dd)
+    #print(ds.compute())
+    #print()
+    #for dd in ds.compute().time_counter:
+    #    print(dd)
 
     return ds
 
