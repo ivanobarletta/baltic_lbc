@@ -50,21 +50,22 @@ outFolderProfiles   = "profiles"
 varname     = "so"
 cmap        = "hot_r"    
 cmin,cmax   = 5,20
+# dates where profiles are extracted and plotted in specific files
+profile_dates = [datetime(2022,4,1),datetime(2022,7,29),datetime(2022,9,28)]
+method      = "max_grad"
 
+"""
 varname     = "thetao"
 cmap        = "Spectral_r"    
 cmin,cmax   = 3,20
+# dates where profiles are extracted and plotted in specific files
+profile_dates = [datetime(2022,8,25),datetime(2023,8,7)]
+method      = "threshold"
+"""
 
 lon0,lat0   = 13.5,55
 
-method      = "threshold"
-
 max_depth   = 50
-
-# dates where profiles are extracted and plotted in specific files
-profile_dates = [datetime(2022,4,1),datetime(2022,7,29),datetime(2022,9,28)]
-profile_dates = [datetime(2022,8,25),datetime(2023,8,7)]
-
 
 ds_glo      = xr.open_dataset("../cmems_glob12/glo_anfc_subset.nc")
 ds_bal      = xr.open_dataset("../cmems_baltic/bal_anfc_subset2.nc")
