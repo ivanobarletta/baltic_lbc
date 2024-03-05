@@ -355,7 +355,10 @@ def make_1_2x1plot2(dsCoords=None
 
 #make_1_2x1plot2(dsCoords=dsCoords,ds1=dsSIREN,ds2=dsCDOGlo,varname="vozocrtx",date_str="20220701",xidx=0,dsmask=dsUMASK,vminn=-0.3,vmaxx=0.3,labels=["GLO (Siren)","GLO (CDO)"])
 
-make_1_2x1plot2(dsCoords=dsCoords,ds1=dsSIREN,ds2=dsCDOGlo,varname="vozocrtx",date_str="20221001",xidx=0,dsmask=dsUMASK,vminn=-0.3,vmaxx=0.3,labels=["GLO (Siren)","GLO (CDO)"])
+#make_1_2x1plot2(dsCoords=dsCoords,ds1=dsSIREN,ds2=dsCDOGlo,varname="vozocrtx",date_str="20221001",xidx=0,dsmask=dsUMASK,vminn=-0.3,vmaxx=0.3,labels=["GLO (Siren)","GLO (CDO)"])
 
+#make_1_2x1plot2(dsCoords=dsCoords,ds1=dsCDO,ds2=dsXESMF,varname="vozocrtx",date_str="20220922",xidx=0,dsmask=dsUMASK,vminn=-0.3,vmaxx=0.3,labels=["BAL (CDO)","BAL (xESMF)"])
+
+make_1_2x1plot2(dsCoords=dsCoords,ds1=dsCDO,ds2=dsXESMF,varname="votemper",date_str="20220922",xidx=0,dsmask=dsUMASK,vminn=12,vmaxx=18,labels=["BAL (CDO)","BAL (xESMF)"])
 
 plt.show()
