@@ -34,9 +34,9 @@ import sys
     -------------------------------------------------
 
     transectType == "we" 
-    idxList = [yidx,xidx1,xidx2]
+        idxList = [yidx,xidx1,xidx2]
     transectType == "sn" 
-    idxList = [xidx,yidx1,yidx2]
+        idxList = [xidx,yidx1,yidx2]
     
 
 """
@@ -77,6 +77,15 @@ outFile         = "transports_Skagerrat_compute.nc"
 Ntasks          = 20
 varName         = "uo"
 
+# Gibraltar
+rootFolder      = "/mnt/lustre/scratch/nlsas/home/empresa/nrd/NRD/RAWDATA_NEATL36/PHY/PHY-FC-FRE/CONTROL"
+rootFileName    = "NEATL36_1d25h-m_3DU-uo_*.nc"
+fileList        = sorted(glob.glob(os.path.join(rootFolder,"*",rootFileName)))
+transectType    = "sn"      # south-north ->  sum(u * e2u * e3u * umask )
+idxList         = [515,400,425]       # Gibraltar (type (sn))
+outFile         = "transports_Gibraltar.nc"
+Ntasks          = 10
+varName         = "uo"
 
 def calcXFaces(coordsPath="",zCoordsPath="",vMaskPath="",idxList=[]):
     """
