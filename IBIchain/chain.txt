@@ -1,0 +1,124 @@
+How to run a simulation chain on FT3 (NEATL36 configuration):
+
+	MAIN FOLDER:
+		
+		/home/empresa/nrd/mod/OPERATIVAS/SIM_NEATL36/proc
+
+		The main script to launch the simulation chain is:
+
+		1) IBI_cron_launcherPHY-FC-FRE_LOOPDATES.job
+
+		The start/end dates are defined in variables:
+
+			dateini="YYYYmmDD"
+			datefin="YYYYmmDD"	
+
+		Set the same datefin=dateini if you want 1 cycle only ( 1 cycle is 7 days).
+
+		The following important script is:
+
+		2) IBI_start_PHY-FC-FRE.job
+
+		At line 47 the command
+
+		./IBI_${modelo}pred_${CONFIG}.job ${CONFIG} >> ${logsd}/log.IBI.${dateic}.${CONFIG}
+
+		will search for a script according to the values of ${modelo} and ${CONFIG} variables
+
+		for Control run simulation is
+			${modelo}=NEMO
+			${CONFIG}=PHY-FC-FRE
+		
+		This script is in /home/empresa/nrd/mod/OPERATIVAS/SIM_NEATL36/proc/PHY folder
+
+		3) PHY/IBI_NEMOpred_PHY-FC-FRE.job
+
+		Main steps of this script are:
+
+			3a) copy necessary fixfiles 	./IBI_cpfixfilesNEMO.job ${CONFIG}
+			3b) prepare namelists		./IBI_prepnamelistNEMO.job 
+			3c) copy forcing files		./IBI_cpforcingNEMO.job ${CONFIG} 
+			3d) copy restart files		./IBI_preprestartPHY.job ${CONFIG}
+			3e) run NEMO			./IBI_NEMOrun.job ${CONFIG} 
+	
+		4) PHY/IBI_NEMOrun.job
+			Is the script that actually runs the simulation
+
+
+	EXECUTABLES:
+		the executables (nemo.exe, xios_server.exe) are in
+
+		/home/empresa/nrd/mod/OPERATIVAS/SIM_NEATL36/fixfiles/PHY/PHY-FC-FRE/exec
+
+		the chain will search for exactly:
+			"nemo.exe"
+			"xios_server.exe"
+
+		If you want to use another executable add it to this
+		folder (with DIFFERENT NAME!) and create symbolic link
+		to -> nemo.exe (or -> xios_server.exe)
+
+	NAMELISTS:
+		The namelist templates are in folder:
+			
+			/home/empresa/nrd/mod/OPERATIVAS/SIM_NEATL36/conf/PHY/PHY-FC-FRE
+		
+		The chain searches for a template for NEMO in the path:
+
+			namelist_cfg.type_wavcoupling
+
+		If you want to use another namelist use symbolic links.
+
+			ln -s my_namelist namelist_cfg.type_wavcoupling
+
+
+	OUTPUT folder:
+		
+		you can set the output folder in this script
+
+		/home/empresa/nrd/mod/OPERATIVAS/SIM_NEATL36/lists/PHY/PHY-FC-FRE_expconfig.list
+
+		and change the variable TEST 
+		
+			TEST="CONTROL" / "EXPERIMENT0" / "TEST_BT" / "WHATEVER" 
+	
+		The resulting output folder is:
+			
+			/mnt/lustre/scratch/nlsas/home/empresa/nrd/NRD/RAWDATA_NEATL36/PHY/PHY-FC-FRE/${TEST}
+
+	CRONTAB info:
+		after the set up of crontab ("crontab -e")
+
+		this has to be synchronized for all the login nodes.
+
+		Use the command:
+			sync_cron	
+
+		You'll be prompted to insert the password of your account
+		for all the login nodes.
+
+
+	FLAGS:
+		report of past runs:
+			/home/empresa/nrd/mod/OPERATIVAS/SIM_NEATL36/flags/PHY/LASTRUNdate_PHY-FC-FRE_flag		
+
+			chows the first date of last chain run
+
+		status of current run:
+			/home/empresa/nrd/mod/OPERATIVAS/SIM_NEATL36/flags/PHY/NOTRUNSIMU_PHY-FC-FRE_flag
+			
+			IF 1 -> chain is not running
+			IF 0 -> chain is running
+
+	LOGS:
+		For info about the chain and errors check this log:
+
+			/home/empresa/nrd/mod/OPERATIVAS/SIM_NEATL36/logs/PHY/PHY-FC-FRE/log.IBI.20220105.PHY-FC-FRE
+
+		
+
+NRD STORE -> upstream data
+
+	/lists/PHY/*.list
+	expconfig.list (now is "CONTROL")
+	-> RAWDATA
