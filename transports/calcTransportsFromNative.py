@@ -5,7 +5,20 @@ import glob
 import os
 import sys
 
+
+
 """
+    Purpose: Calculate transport across a given transect 
+    on native NEMO mesh:
+
+    Two kinds of transects are considered:
+    	sn = South-North
+	we = West-East
+
+    The transects are identified by indexes on the native 
+    curvilinear mesh, as showed below
+
+
     -------------------------------------------------
     |                                               |
     |       transectType = we                       |    
@@ -38,6 +51,26 @@ import sys
     transectType == "sn" 
         idxList = [xidx,yidx1,yidx2]
     
+
+    The arguments for main() function are:
+    	1) list of files to process
+	2) the variable name 
+	3) list of indexes identifying the transect
+	4) the kind of transect ("sn"/"we")
+	5) the path to horizontal scale factors (usually coordinates.nc)
+	6) the path to vertical scale factors (usually mesh_zgr.nc)
+	7) the path to 3D mask file 
+	8) the number of tasks (the number of files opened for each task are
+				approximately nFiles / Ntasks)
+
+	9) name of output file
+
+
+    Note: 
+    	the final concatenation is very slow -> submit on medium (30-40 min) 
+	queue at least	
+
+    Contact: ivano.barletta@nowsystems.eu		
 
 """
 
