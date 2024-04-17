@@ -70,6 +70,7 @@ gl.xlabels_top = False
 gl.ylabels_left = False
 
 cb = fig.colorbar(cf,ax=ax,orientation="horizontal",pad=0.05)
+cb.set_label(r"$\alpha$",fontsize=15)
 
 # create smaller axes inside
 #ax_inset = inset_axes(ax,width="30%",height="30%",loc="upper left",axes_class=cartopy.mpl.geoaxes.GeoAxes,axes_kwargs=dict(projection=projj))
@@ -94,5 +95,7 @@ gl2.xlabels_bottom  = False
 gl2.ylabels_right   = False
 
 figname = "alpha_neatl36_and_east2"
+
+
 
 plt.savefig(figname,bbox_inches="tight",dpi=600)
