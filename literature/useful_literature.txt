@@ -1,0 +1,43 @@
+1)
+
+	M. A. MrozowskaM. JochumS. BastinR. R. Hansen
+
+	Using NIW Observations to Assess Mixed Layer Parameterizations: A Case Study in the Tropical Atlantic
+
+	why?
+
+	a) application of PowerSpecrtalDensity to wind speed components
+	b) good quality of plots in general
+
+
+2) 	A. Wise, Calafat
+
+	Using Shelf‐Edge Transport Composition and Sensitivity Experiments to Understand Processes
+	Driving Sea Level on the Northwest European Shelf
+
+	why? 
+
+	a) interesting application of EOF to sea level / altimetry data
+
+3)	Karna, 2021
+
+	NEMO-NORDIC 2.0: operational marine forecast model for the baltic sea
+
+	why?
+
+	a) taylor diagram to summarize model performance metrics
+	b) surface tracer comparison against ferry box measurements
+	c) good quality of scatter plots
+	d) analysis of timeseries in storm events (fig. 13)
+	e) look at the metrics defined (section 2.5)	
+
+4)
+	Medvedev IP,RabinovichABand
+	Kulikov EA(2016)TidesinThree
+	Enclosed Basins:TheBaltic,Black,and CaspianSeas.
+	Front. Mar.Sci.3:46.
+	doi: 10.3389/fmars.2016.00046
+
+	why?
+
+	a) power spectra of Tide gauge data

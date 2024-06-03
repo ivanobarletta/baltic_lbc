@@ -47,14 +47,15 @@ data_crs = ccrs.PlateCarree()
 plt.figure()
 ax = plt.axes(projection=projj)
 
-ax.scatter(xT,yT,marker="o",color="r",s=0.2,transform=data_crs)
-ax.plot(xf,yf,color="k",linewidth=0.5,transform=data_crs)
-ax.plot(xf.T,yf.T,color="k",linewidth=0.5,transform=data_crs)
+ax.scatter(xT,yT,marker="o",color="r",s=0.2,transform=data_crs,zorder=2)
+ax.scatter(xf,yf,marker="x",color="b",s=0.4,transform=data_crs,zorder=2)
+ax.plot(xf,yf,color="k",linewidth=0.5,transform=data_crs,zorder=1)
+ax.plot(xf.T,yf.T,color="k",linewidth=0.5,transform=data_crs,zorder=1)
 # add line where transports are computed
-ax.plot(xT.isel(x=-1),yT.isel(x=-1),color="b",linewidth=0.5,transform=data_crs)
+#ax.plot(xT.isel(x=-1),yT.isel(x=-1),color="b",linewidth=0.5,transform=data_crs)
 
 # add box 
-ax.plot(xx,yy,color="r",linewidth=1.2,transform=data_crs)
+#ax.plot(xx,yy,color="r",linewidth=1.2,transform=data_crs)
 
 
 #ax.quiver(xT.data,yT.data,-gcost,-gsint,color="g",label=r"(-gcost,-gsint)($\hat{i}$)",transform=data_crs)
@@ -70,7 +71,7 @@ gl.ylabels_left = False
 
 ax.set_extent([13,14,54.5,55.5])
 
-plt.savefig("3curvilinear_LBC_mesh",dpi=600,bbox_inches="tight")
+plt.savefig("4curvilinear_LBC_mesh",dpi=600,bbox_inches="tight")
 
 # -----
 # Figure 2 (zoom)
@@ -107,6 +108,6 @@ ax.legend()
 
 plt.savefig("3curvilinear_LBC_mesh_and_normals",dpi=600,bbox_inches="tight")
 
-plt.show()
+#plt.show()
 
 
