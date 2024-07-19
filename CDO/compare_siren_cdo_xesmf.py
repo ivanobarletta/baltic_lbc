@@ -7,16 +7,16 @@ import numpy as np
 
 varName = "votemper"
 varName = "vozocrtx"
-iLevel = 10
+iLevel = 16
 method = "conservative"
 
 pathSiren = "../neatl_lbc_files/NEATL36_obcdta_east_2_20220115P01_R20220123.nc"
 
-pathCDO = "test_out_cons2.nc"
+pathCDO = "NEATL36_east2_BAL_CDO_20220115.nc"
 
 pathCMEMS = "../cmems_baltic/BAL-NEMO_PHY-DailyMeans-20220115.nc"
 
-pathXESMF = "../xesmf_create_LBC/test_out_xesmf.nc"
+pathXESMF = "../XESMF/NEATL36_east2_BAL_XESMF_20220115.nc"
 
 dsSiren = xr.open_dataset(pathSiren)
 dsCDO   = xr.open_dataset(pathCDO)
@@ -44,6 +44,8 @@ deptht = dsSiren.deptht
 varSiren = dsSiren[varName].isel(T=0,Z=iLevel)
 varCDO  = dsCDO[varName].isel(T=0,Z=iLevel)
 varXESMF = dsXESMF[varName].isel(T=0,Z=iLevel)
+
+print("extracting depth: %.2f " % deptht.isel(Z=iLevel))
 
 varName2 = guess_cmems_varname(varName=varName)
 kw = {"fill_value":"extrapolate"}
@@ -99,6 +101,7 @@ def get_poly_corners(lons,lats):
 
 xx,yy = get_poly_corners(lons,lats)
 
+print("poly corners")
 print(xx)
 print (yy)
 
@@ -126,15 +129,18 @@ figtitle = "%s - depth %s - time: %s - method: %s" % (varName,deptht.isel(Z=iLev
 plt.suptitle(figtitle)
 ax[0].set_title("Siren")
 ax[1].set_title("CDO")
-ax[2].set_title("CMEMS")
+ax[2].set_title("BALMFC")
 ax[3].set_title("XESMF")
 
 #cb = fig.colorbar(cf2, ax=ax.ravel().tolist())
 #cb.set_label(clabel)
 
-filename = "2_%s_level_%d_%s" % (varName,iLevel,method)
+filename = "3_%s_level_%d_%s" % (varName,iLevel,method)
 
 plt.savefig(filename,dpi=600,bbox_inches="tight")
+
+# create transects
+
 
 
 
