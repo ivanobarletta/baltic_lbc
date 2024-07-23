@@ -7,14 +7,13 @@ from math import radians, cos, sin, asin, sqrt
 from transport_tools import calcNEMOTransport
 from os.path import join
 
-
-P1 = (13.6,54.54)
-P2 = (13.6,55.45)
-
+transectName = "arkona"        # name of transect (for outFile)
 P1 = (13.33,54.45)
 P2 = (13.33,55.45)
 
-
+transectName = "arkona2_test"        # name of transect (for outFile)
+P1 = (13.6,54.54)
+P2 = (13.6,55.45)
 
 root = "/mnt/lustre/scratch/nlsas/home/empresa/nrd/NRD/STORE/BALMFC_PRODUCTS/LBC_4NEATL/CDO/outputs_bal/"
 rootStatic = "/mnt/lustre/scratch/nlsas/home/empresa/nrd/NRD/STORE/BALMFC_PRODUCTS/LBC_4NEATL/static_files/"
@@ -28,12 +27,14 @@ pathS = root + "NEATL36_east2_BAL_CDO_????????.nc"                     # path of
 pathMaskU = rootStatic + "mask_testrun/mask_gridU_east2.nc"                
 pathMaskV = rootStatic + "mask_testrun/mask_gridV_east2.nc"                        
 outFileRoot = "out_transport_%s.nc" # outfile root
-transectName = "arkona"        # name of transect (for outFile)
-computeS = False               # compute salinity transport (if True you must set pathS)       
+
+computeS = True               # compute salinity transport (if True you must set pathS)       
+varNameS = "vosaline"           # name of salinity variable in files 
 verbose = True
 fileType = "nemo_obc"           
-makePlot = False
+makePlot = True
 obcType = "E"
+
 
 calcNEMOTransport(                                  # Wrapper to the main function
                         P1 = P1,                            # start point (lon,lat) tuple
@@ -48,7 +49,8 @@ calcNEMOTransport(                                  # Wrapper to the main functi
                         pathMaskV = pathMaskV,              # path of Vmask file             
                         outFileRoot = outFileRoot,                  # outfile root
                         transectName = transectName,        # name of transect (for outFile)
-                        computeS = False,                   # compute salinity transport (if True you must set pathS)       
+                        computeS = computeS,                # compute salinity transport (if True you must set pathS)   
+                        varNameS = varNameS,                # name of salinity variable in fileS    
                         verbose = verbose,                  # print more info
                         fileType = fileType,                # file type is one of "nemo_out" or "nemo_obc"
                         makePlot= makePlot,                 # make a plot of mesh geometry, transect line and segments that approximate the latter

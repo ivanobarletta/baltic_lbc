@@ -278,7 +278,11 @@ def extract_uv_indices(indicesF=[],verbose=False):
 
     return indicesV,indicesU
 
-
+    # t_indices are time-varying, they depend on sign of velocity field
+def extract_t_indices(
+                    
+                    ):
+    pass
 
 """
 def fix_f_indices(indexes):
