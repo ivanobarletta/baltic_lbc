@@ -8,16 +8,8 @@ import sys
 
 
 """
-    Purpose: Calculate transport across a given transect 
-    on native NEMO mesh:
-
-    Two kinds of transects are considered:
-    	sn = South-North
-	we = West-East
-
-    The transects are identified by indexes on the native 
-    curvilinear mesh, as showed below
-
+    The script calculates transport from NEMO outputs only along
+    fixed curvilinear direction (see below):
 
     -------------------------------------------------
     |                                               |
@@ -46,79 +38,84 @@ import sys
     |                                               |                              
     -------------------------------------------------
 
+    Two types of transect are considered:
+
     transectType == "we" 
+        Fixed y index (latitude) -> West-East Transect 
         idxList = [yidx,xidx1,xidx2]
     transectType == "sn" 
+        Fixed x index (longitude) -> South-North Transect
         idxList = [xidx,yidx1,yidx2]
     
-
-    The arguments for main() function are:
-    	1) list of files to process
-	2) the variable name 
-	3) list of indexes identifying the transect
-	4) the kind of transect ("sn"/"we")
-	5) the path to horizontal scale factors (usually coordinates.nc)
-	6) the path to vertical scale factors (usually mesh_zgr.nc)
-	7) the path to 3D mask file 
-	8) the number of tasks (the number of files opened for each task are
-				approximately nFiles / Ntasks)
-
-	9) name of output file
-
-
-    Note: 
-    	the final concatenation is very slow -> submit on medium (30-40 min) 
-	queue at least	
-
-    Contact: ivano.barletta@nowsystems.eu		
-
 """
 
-uMaskPath       = "../static_files/mask_gridU.nc"
-vMaskPath       = "../static_files/mask_gridV.nc"
-coordsPath      = "../target_grid/coordinates.nc"
-zMeshPath       = "../static_files/mesh_zgr.nc"
+uMaskPath       = "/mnt/lustre/scratch/nlsas/home/empresa/nrd/NRD/STORE/BALMFC_PRODUCTS/LBC_4NEATL/static_files/mask_testrun/mask_gridU.nc"
+vMaskPath       = "/mnt/lustre/scratch/nlsas/home/empresa/nrd/NRD/STORE/BALMFC_PRODUCTS/LBC_4NEATL/static_files/mask_testrun/mask_gridV.nc"
+coordsPath      = "/mnt/lustre/scratch/nlsas/home/empresa/nrd/NRD/STORE/BALMFC_PRODUCTS/LBC_4NEATL/target_grid/coordinates.nc"
+zCoordsPath     = "/mnt/lustre/scratch/nlsas/home/empresa/nrd/NRD/STORE/BALMFC_PRODUCTS/LBC_4NEATL/static_files/mask_testrun/NEATL36_TESTRUN_1d25h-m_e3u_202201.nc"
 
-
-# east2
-rootFolder      = "/mnt/lustre/scratch/nlsas/home/empresa/nrd/NRD/RAWDATA_NEATL36/PHY/PHY-FC-FRE/CONTROL"
-rootFileName    = "NEATL36_1d25h-m_3DU-uo_*.nc"
-fileList        = sorted(glob.glob(os.path.join(rootFolder,"*",rootFileName)))
-transectType    = "sn"      # south-north ->  sum(u * e2u * e3u * umask )
-idxList         = [-3,1478,1478+73]     # east2 open bonudary (type (sn))
-outFile         = "transports_East2.nc"
-Ntasks          = 50
-varName         = "uo"
-
-# Kattegat 
-rootFolder      = "/mnt/lustre/scratch/nlsas/home/empresa/nrd/NRD/RAWDATA_NEATL36/PHY/PHY-FC-FRE/CONTROL"
-rootFileName    = "NEATL36_1d25h-m_3DV-vo_*.nc"
-fileList        = sorted(glob.glob(os.path.join(rootFolder,"*",rootFileName)))
-transectType    = "we"      # south-north ->  sum(u * e2u * e3u * umask )
-idxList         = [1616,945,1033]       # Kattegat (type (we))
-outFile         = "transports_Kattegat.nc"
-Ntasks          = 50
-varName         = "vo"
-
-# Skagerrat
-rootFolder      = "/mnt/lustre/scratch/nlsas/home/empresa/nrd/NRD/RAWDATA_NEATL36/PHY/PHY-FC-FRE/CONTROL"
-rootFileName    = "NEATL36_1d25h-m_3DU-uo_*.nc"
-fileList        = sorted(glob.glob(os.path.join(rootFolder,"*",rootFileName)))
-transectType    = "sn"      # south-north ->  sum(u * e2u * e3u * umask )
-idxList         = [905,1592,1734]       # Skagerrak (type (sn))
-outFile         = "transports_Skagerrat_compute.nc"
-Ntasks          = 20
-varName         = "uo"
-
-# Gibraltar
+########################### Gibraltar
 rootFolder      = "/mnt/lustre/scratch/nlsas/home/empresa/nrd/NRD/RAWDATA_NEATL36/PHY/PHY-FC-FRE/CONTROL"
 rootFileName    = "NEATL36_1d25h-m_3DU-uo_*.nc"
 fileList        = sorted(glob.glob(os.path.join(rootFolder,"*",rootFileName)))
 transectType    = "sn"      # south-north ->  sum(u * e2u * e3u * umask )
 idxList         = [515,400,425]       # Gibraltar (type (sn))
-outFile         = "transports_Gibraltar.nc"
-Ntasks          = 10
+outFile         = "transports_control_run_Gibraltar.nc"
+Ntasks          = 1
 varName         = "uo"
+
+########################### Kattegat 
+rootFolder      = "/mnt/lustre/scratch/nlsas/home/empresa/nrd/NRD/RAWDATA_NEATL36/PHY/PHY-FC-FRE/CONTROL"
+rootFileName    = "NEATL36_1d25h-m_3DV-vo_*.nc"
+fileList        = sorted(glob.glob(os.path.join(rootFolder,"*",rootFileName)))
+transectType    = "we"      # south-north ->  sum(u * e2u * e3u * umask )
+idxList         = [1616,945,1033]       # Kattegat (type (we))
+outFile         = "transports_control_run_Kattegat.nc"
+Ntasks          = 1
+varName         = "vo"
+
+########################### Skagerrat
+rootFolder      = "/mnt/lustre/scratch/nlsas/home/empresa/nrd/NRD/RAWDATA_NEATL36/PHY/PHY-FC-FRE/CONTROL"
+rootFileName    = "NEATL36_1d25h-m_3DU-uo_*.nc"
+fileList        = sorted(glob.glob(os.path.join(rootFolder,"*",rootFileName)))
+transectType    = "sn"      # south-north ->  sum(u * e2u * e3u * umask )
+idxList         = [905,1592,1734]       # Skagerrak (type (sn))
+outFile         = "transports_control_run_Skagerrak.nc"
+Ntasks          = 1
+varName         = "uo"
+
+########################### east2
+rootFolder      = "/mnt/lustre/scratch/nlsas/home/empresa/nrd/NRD/STORE/BALMFC_PRODUCTS/LBC_4NEATL/TESTRUN2_run_outs/ZNB_native_mesh"
+rootFileName    = "NEATL36_TESTRUN_1d25h-m_3DU-uo_*.nc_ZNB"
+#fileList        = sorted(glob.glob(os.path.join(rootFolder,"*",rootFileName)))
+fileList        = sorted(glob.glob(os.path.join(rootFolder,rootFileName)))
+
+uMaskPath       = "/mnt/lustre/scratch/nlsas/home/empresa/nrd/NRD/STORE/BALMFC_PRODUCTS/LBC_4NEATL/TESTRUN2_run_outs/ZNB_native_mesh/static/mask_gridU_ZNB.nc"
+vMaskPath       = "/mnt/lustre/scratch/nlsas/home/empresa/nrd/NRD/STORE/BALMFC_PRODUCTS/LBC_4NEATL/TESTRUN2_run_outs/ZNB_native_mesh/static/mask_gridV_ZNB.nc"
+coordsPath      = "/mnt/lustre/scratch/nlsas/home/empresa/nrd/NRD/STORE/BALMFC_PRODUCTS/LBC_4NEATL/TESTRUN2_run_outs/ZNB_native_mesh/static/coordinates_NEATL36_ZNB.nc"
+zCoordsPath     = "/mnt/lustre/scratch/nlsas/home/empresa/nrd/NRD/STORE/BALMFC_PRODUCTS/LBC_4NEATL/TESTRUN2_run_outs/ZNB_native_mesh/static/mesh_mask_testrun2_ZNB.nc"
+
+
+transectType    = "sn"      # south-north ->  sum(u * e2u * e3u * umask )
+idxList         = [-3,177,177+73]     # east2 open bonudary (type (sn))
+outFile         = "transports_testrun2_run_East2.nc"
+Ntasks          = 1
+varName         = "uo"
+simulationName  = "TESTRUN2"
+
+calcSaltTransp  = True                                                                  # calculate Salt Transport
+rootFileNameS   = "NEATL36_TESTRUN_1d25h-m_3DT-so_*.nc_ZNB"                             # root for salinity filenames
+fileListS       =  sorted(glob.glob(os.path.join(rootFolder,rootFileNameS)))            # list of salinity files
+varNameS        = "so"
+
+calcHeatTransp  = True
+rootFileNameT   = "NEATL36_TESTRUN_1d25h-m_3DT-thetao_*.nc_ZNB"                         # root for temperature filenames
+fileListT       =  sorted(glob.glob(os.path.join(rootFolder,rootFileNameT)))            # list of salinity files
+varNameT        = "thetao"
+debug           = True
+transectName    = "EAST2"
+
+
 
 def calcXFaces(coordsPath="",zCoordsPath="",vMaskPath="",idxList=[]):
     """
@@ -152,7 +149,10 @@ def calcXFaces(coordsPath="",zCoordsPath="",vMaskPath="",idxList=[]):
 
     e1v = dsCoords["e1v"].isel(y=idxList[0],x=slice(idxList[1],idxList[2]))
 
-    e3v = dsZCoords["e3v_0"].isel(y=idxList[0],x=slice(idxList[1],idxList[2]))
+    try:
+        e3v = dsZCoords["e3v_0"].isel(y=idxList[0],x=slice(idxList[1],idxList[2]))
+    except:      
+        e3v = dsZCoords["e3v_0"].isel(Y=idxList[0],X=slice(idxList[1],idxList[2]))
 
     # the variable might be umask or just "mask"
     try:
@@ -160,7 +160,10 @@ def calcXFaces(coordsPath="",zCoordsPath="",vMaskPath="",idxList=[]):
     except:
         vmask = dsVMask["vmask"].isel(y=idxList[0],x=slice(idxList[1],idxList[2]))
 
-    nz = dsZCoords.sizes["z"]
+    try:
+        nz = dsZCoords.sizes["z"]
+    except:      
+        nz = dsZCoords.sizes["Z"]
 
     e1v     = np.squeeze(e1v)                                           # shape (nx)             
     # repeat e2u along times along z
@@ -205,7 +208,10 @@ def calcYFaces(coordsPath="",zCoordsPath="",uMaskPath="",idxList=[]):
 
     e2u = dsCoords["e2u"].isel(x=idxList[0],y=slice(idxList[1],idxList[2]))
 
-    e3u = dsZCoords["e3u_0"].isel(x=idxList[0],y=slice(idxList[1],idxList[2]))
+    try:
+        e3u = dsZCoords["e3u_0"].isel(x=idxList[0],y=slice(idxList[1],idxList[2]))
+    except:      
+        e3u = dsZCoords["e3u_0"].isel(X=idxList[0],Y=slice(idxList[1],idxList[2]))
 
     # the variable might be umask or just "mask"
     try:
@@ -213,7 +219,10 @@ def calcYFaces(coordsPath="",zCoordsPath="",uMaskPath="",idxList=[]):
     except:
         umask = dsUMask["umask"].isel(x=idxList[0],y=slice(idxList[1],idxList[2]))
 
-    nz = dsZCoords.sizes["z"]
+    try:
+        nz = dsZCoords.sizes["z"]
+    except:
+        nz = dsZCoords.sizes["Z"]
 
     e2u     = np.squeeze(e2u)                                           # shape (ny)             
     # repeat e2u along times along z
@@ -287,20 +296,60 @@ def chunk_bounds(Ntasks,task,number):
 def main(fileList = []                  # list of files to process
          ,varName = "u"                 # variable name for velocity component
          ,transectType = "sn"           # type of transect: sn (south-north) / we (west-east)
+         ,transectName = "transectName"
          ,idxList = []                  # indexes identifying the transect: sn -> [xidx,yidx1,yidx2] or we -> [yidx,xidx1,xidx2]
          ,coordsPath = ""               # path of dataset with horizontal scale factors 
          ,zCoordsPath = ""              # path of dataset with vertical scale factors
-         ,maskPath = ""                 # path of file with mask
+         ,uMaskPath = ""                # path of file with mask
+         ,vMaskPath = ""                
          ,Ntasks = 1                    # number of tasks to subdivide computations
-         ,outFile = "out.nc"):          # output file name
+         ,outFile = "out.nc"            # output file name
+         ,simulationName = ""           # name of experiment 
+         ,calcSaltTransp = False
+         ,fileListS = []
+         ,varNameS  = "so"
+         ,calcHeatTransp = False
+         ,fileListT = []
+         ,varNameT = "thetao"
+         ,debug = False
+         ):          
     
-    Nfiles = len(fileList)
+    debugFile   = "transport_from_outputs_debug.dat"
+
+    if debug:
+        if os.path.isfile(debugFile):
+            os.system("rm %s" % debugFile)
+
+    volConversion   = 1e-6  # m^3/s to Sv
+    rhoWater        = 1025  # kg / m^3
+    cpWater         = 3996  # J/Kg/K
+    saltConversion  = rhoWater * 1e-12
+    heatConversion  = 1e-15
+
+    Nfiles  = len(fileList)
+    NfilesS = len(fileListS)
+    NfilesT = len(fileListT)
 
     # do some checks
     if Nfiles == 0:
         raise Exception("Error: File list is empty. Check the path of files")        
 
+    if calcSaltTransp == True:
+        if NfilesS == 0:
+            raise Exception("Error: calcSaltTransp is True and Salinity file list is empty. You set Check the path of files")
+        if NfilesS != Nfiles:
+            raise Exception("Error: the number of Salinity Files (%s) must be the same as Velocity files (%d)" % (NfilesS,Nfiles))
+
+    if calcHeatTransp == True:
+        if NfilesT == 0:
+            raise Exception("Error: calcHeatTransp is True and Temperature file list is empty. You set Check the path of files")
+        if NfilesT != Nfiles:
+            raise Exception("Error: the number of Temperature Files (%s) must be the same as Velocity files (%d)" % (NfilesT,Nfiles))
+
     print("Processing %d files" % Nfiles )
+    if debug:
+        with open(debugFile,"a") as f:
+            f.write("Processing %d files\n" % Nfiles )
 
     if transectType not in ["sn","we"]:
         raise Exception("Error: transectType not recognized")
@@ -310,12 +359,26 @@ def main(fileList = []                  # list of files to process
 
     # calculate areas of faces
     if transectType == "sn":
-        faces = calcYFaces(coordsPath=coordsPath,zCoordsPath=zCoordsPath,uMaskPath=maskPath,idxList=idxList)
+        faces = calcYFaces(coordsPath=coordsPath,zCoordsPath=zCoordsPath,uMaskPath=uMaskPath,idxList=idxList)
 
     if transectType == "we":
-        faces = calcXFaces(coordsPath=coordsPath,zCoordsPath=zCoordsPath,vMaskPath=maskPath,idxList=idxList)
+        faces = calcXFaces(coordsPath=coordsPath,zCoordsPath=zCoordsPath,vMaskPath=vMaskPath,idxList=idxList)
 
-    ds_list = []
+    # List to collect 1D arrays
+    daListTotalVolume       = []    # volume
+    daListDirection1Volume  = []    
+    daListDirection2Volume  = []
+    daListTotalSalt         = []    # salt
+    daListDirection1Salt    = []
+    daListDirection2Salt    = []
+    daListTotalHeat         = []    # heat
+    daListDirection1Heat    = []
+    daListDirection2Heat    = []
+
+    # list to collect 3D arrays
+    daListVolume3D          = [] # here I save (t,z,y) or (t,z,x) volume transport transect
+    daListSalt3D            = [] # here I save (t,z,y) or (t,z,x) salt transport transect
+    daListHeat3D            = [] # here I save (t,z,y) or (t,z,x) heat transport transect
 
     for task in range(Ntasks):
 
@@ -323,26 +386,227 @@ def main(fileList = []                  # list of files to process
 
         fileListSubset = fileList[i0:i1]     
 
-        print ("task: %s - processing %d files " % (task,i1-i0))
+        print ("task: %s - processing %d files \n" % (task,i1-i0))
 
-        ds = xr.open_mfdataset(fileListSubset)
+        if debug:
+            with open(debugFile,"a") as f:
+                f.write("Opening velocity files\n")
+
+        dsVel = xr.open_mfdataset(fileListSubset)
+        if debug:
+            with open(debugFile,"a") as f:
+                f.write("Velocity Dataset Open\n")
+
+        if calcSaltTransp:
+            if debug:
+                with open(debugFile,"a") as f:
+                    f.write("Opening salinity files\n")
+            dsSalt = xr.open_mfdataset(fileListS)
+            if debug:
+                with open(debugFile,"a") as f:
+                    f.write("Salinity Dataset Open\n")
+
+        if calcHeatTransp:
+            if debug:
+                with open(debugFile,"a") as f:
+                    f.write("Opening Temperture files\n")
+            dsTemp = xr.open_mfdataset(fileListT)
+            if debug:
+                with open(debugFile,"a") as f:
+                    f.write("Temperature Dataset Open\n")
+
 
         if transectType == "sn":
             # multiply by faces and sum 
-            transport = (ds[varName].isel(x=idxList[0],y=slice(idxList[1],idxList[2])) * faces ).sum(dim=["depthu","y"])
-            ds_list.append( transport.to_dataset().rename({varName:"transport"}) )
+            volumeTransport3D           = (dsVel[varName].isel(x=idxList[0],y=slice(idxList[1],idxList[2])) * faces ) # (t,z,y)
+            volumeTransportTotal        = volumeTransport3D.sum(dim=["depthu","y"])
+            volumeTransportDirection1   = volumeTransport3D.where(volumeTransport3D>=0,0).sum(dim=["depthu","y"])
+            volumeTransportDirection2   = volumeTransport3D.where(volumeTransport3D<0,0).sum(dim=["depthu","y"])
+            # Note: the command where(transport>0,0) to calculate positive transport
+            # seems counter-intuitive, and actually is. Normally, to calculate positive 
+            # transport one should filter the negative values, like:
+            #
+            #   transport_direction1 = transport3D.where(transport3D<0,0)
+            #
+            # this way I should get only positive values. Actually what I get is all the 
+            # way around. That's why the code lines above are opposite
+
+            if debug:
+                with open(debugFile,"a") as f:
+                    f.write("Volume Transport Computed\n")
+
+            if calcSaltTransp:                                # (t,z,y)                             (t,z,y)
+                saltTransport3D         = volumeTransport3D * dsSalt[varNameS].isel(x=idxList[0],y=slice(idxList[1],idxList[2])).data #(t,z,y)
+                saltTransportTotal      = saltTransport3D.sum(dim=["depthu","y"])
+                saltTransportDirection1 = saltTransport3D.where(saltTransport3D>=0,0).sum(dim=["depthu","y"])
+                saltTransportDirection2 = saltTransport3D.where(saltTransport3D<0,0).sum(dim=["depthu","y"])
+                if debug:
+                    with open(debugFile,"a") as f:
+                        f.write("Salt Transport Computed\n")
+
+            if calcHeatTransp:                                      # (t,z,y)                             (t,z,y)
+                heatTransport3D         = rhoWater * cpWater * volumeTransport3D * dsTemp[varNameT].isel(x=idxList[0],y=slice(idxList[1],idxList[2])).data #(t,z,y)
+                heatTransportTotal      = heatTransport3D.sum(dim=["depthu","y"])
+                heatTransportDirection1 = heatTransport3D.where(heatTransport3D>=0,0).sum(dim=["depthu","y"])
+                heatTransportDirection2 = heatTransport3D.where(heatTransport3D<0,0).sum(dim=["depthu","y"])
+                if debug:
+                    with open(debugFile,"a") as f:
+                        f.write("Heat Transport Computed\n")
 
         if transectType == "we":    
             # multiply by faces and sum 
-            transport = (ds[varName].isel(y=idxList[0],x=slice(idxList[1],idxList[2])) * faces ).sum(dim=["depthv","x"])
-            ds_list.append( transport.to_dataset().rename({varName:"transport"}) )
+            volumeTransport3D = (dsVel[varName].isel(y=idxList[0],x=slice(idxList[1],idxList[2])) * faces )          #(t,z,x)
+            volumeTransportTotal      = volumeTransport3D.sum(dim=["depthv","x"])
+            volumeTransportDirection1 = volumeTransport3D.where(volumeTransport3D>=0,0).sum(dim=["depthv","x"])       
+            volumeTransportDirection2 = volumeTransport3D.where(volumeTransport3D<0,0).sum(dim=["depthv","x"])
 
-        ds.close()
+            if debug:
+                with open(debugFile,"a") as f:
+                    f.write("Volume Transport Computed\n")
+
+            if calcSaltTransp:                                 # (t,z,y)                             (t,z,y)
+                saltTransport3D         = volumeTransport3D * dsSalt[varNameS].isel(y=idxList[0],x=slice(idxList[1],idxList[2])).data #(t,z,x)
+                saltTransportTotal      = saltTransport3D.sum(dim=["depthv","x"])
+                saltTransportDirection1 = saltTransport3D.where(saltTransport3D>=0,0).sum(dim=["depthv","x"])
+                saltTransportDirection2 = saltTransport3D.where(saltTransport3D<0,0).sum(dim=["depthv","x"])
+
+                if debug:
+                    with open(debugFile,"a") as f:
+                        f.write("Salt Transport Computed\n")
+
+            if calcHeatTransp:                                     # (t,z,y)                             (t,z,y)
+                heatTransport3D         = rhoWater * cpWater * volumeTransport3D * dsTemp[varNameT].isel(y=idxList[0],x=slice(idxList[1],idxList[2])).data #(t,z,x)
+                heatTransportTotal      = heatTransport3D.sum(dim=["depthv","x"])
+                heatTransportDirection1 = heatTransport3D.where(heatTransport3D>=0,0).sum(dim=["depthv","x"])
+                heatTransportDirection2 = heatTransport3D.where(heatTransport3D<0,0).sum(dim=["depthv","x"])
+
+                if debug:
+                    with open(debugFile,"a") as f:
+                        f.write("Heat Transport Computed\n")
+
+        volumeTransportTotal.name = "volume_transport_total"
+        daListTotalVolume.append(volumeTransportTotal) 
+        volumeTransportDirection1.name = "volume_transport_direction1"
+        daListDirection1Volume.append(volumeTransportDirection1)
+        volumeTransportDirection2.name = "volume_transport_direction2"
+        daListDirection2Volume.append(volumeTransportDirection2)
+        volumeTransport3D.name = "volume_transport"
+        daListVolume3D.append(volumeTransport3D)
+
+        if calcSaltTransp:
+            saltTransportTotal.name = "salt_transport_total"
+            daListTotalSalt.append(saltTransportTotal)
+            saltTransportDirection1.name = "salt_transport_direction1"
+            daListDirection1Salt.append(saltTransportDirection1)
+            saltTransportDirection2.name = "salt_transport_direction2"
+            daListDirection2Salt.append(saltTransportDirection2)
+            saltTransport3D.name = "salt_transport"
+            daListSalt3D.append(saltTransport3D)
+
+        if calcHeatTransp:
+            heatTransportTotal.name = "heat_transport_total"
+            daListTotalHeat.append(heatTransportTotal)
+            heatTransportDirection1.name = "heat_transport_direction1"
+            daListDirection1Heat.append(heatTransportDirection1)
+            heatTransportDirection2.name = "heat_transport_direction2"
+            daListDirection2Heat.append(heatTransportDirection2)
+            heatTransport3D.name = "heat_transport"
+            daListHeat3D.append(heatTransport3D)
+
+        dsVel.close()
+        if calcSaltTransp:
+            dsSalt.close()
+
+        if calcHeatTransp:
+            dsTemp.close()
 
     # concatenate datasets from each task
-    print("Concatenating datasets")
-    dsOut = xr.concat(ds_list, dim="time_counter")
-    dsOut["transport"] = dsOut["transport"].assign_attrs({"units":"m3/s","coordinates":"time_counter"})        
+    if debug:
+        with open(debugFile,"a") as f:
+            f.write("Concatenating DataArrays\n")
+    print("Concatenating DataArrays")
+    dsOut = xr.Dataset()
+    #dsOut = xr.concat(ds_list, dim="time_counter")
+    daOutTotalVolume        = xr.concat(daListTotalVolume,dim="time_counter")
+    daOutTotalVolume        = daOutTotalVolume * volConversion     
+    daOutTotalVolume        = daOutTotalVolume.assign_attrs({"units":"Sv","coordinates":"time_counter"})
+
+    daOutDirection1Volume   = xr.concat(daListDirection1Volume,dim="time_counter")
+    daOutDirection1Volume   = daOutDirection1Volume * volConversion
+    daOutDirection1Volume   = daOutDirection1Volume.assign_attrs({"units":"Sv","coordinates":"time_counter"})
+
+    daOutDirection2Volume   = xr.concat(daListDirection2Volume,dim="time_counter")
+    daOutDirection2Volume   = daOutDirection2Volume * volConversion
+    daOutDirection2Volume   = daOutDirection2Volume.assign_attrs({"units":"Sv","coordinates":"time_counter"})
+
+    daOutVolume             = xr.concat(daListVolume3D,dim="time_counter")
+    daOutVolume             = daOutVolume * volConversion
+    if transectType == "sn":
+        daOutVolume = daOutVolume.assign_attrs({"units":"Sv","coordinates":"time_counter depthu nav_lat"})     
+    if transectType == "we":
+        daOutVolume = daOutVolume.assign_attrs({"units":"Sv","coordinates":"time_counter depthv nav_lon"})     
+
+    # populate dataset
+    dsOut["volume_transport_total"]         = daOutTotalVolume
+    dsOut["volume_transport_direction1"]    = daOutDirection1Volume
+    dsOut["volume_transport_direction2"]    = daOutDirection2Volume
+    dsOut["volume_transport"]               = daOutVolume
+
+    if calcSaltTransp:
+        daOutTotalSalt          = xr.concat(daListTotalSalt,dim="time_counter")
+        daOutTotalSalt          = daOutTotalSalt * saltConversion 
+        daOutTotalSalt          = daOutTotalSalt.assign_attrs({"units":"10^9 Kg/s","coordinates":"time_counter"})
+
+        daOutDirection1Salt     = xr.concat(daListDirection1Salt,dim="time_counter")
+        daOutDirection1Salt     = daOutDirection1Salt * saltConversion 
+        daOutDirection1Salt     = daOutDirection1Salt.assign_attrs({"units":"10^9 Kg/s","coordinates":"time_counter"})
+
+        daOutDirection2Salt     = xr.concat(daListDirection2Salt,dim="time_counter")
+        daOutDirection2Salt     = daOutDirection2Salt * saltConversion 
+        daOutDirection2Salt     = daOutDirection2Salt.assign_attrs({"units":"10^9 Kg/s","coordinates":"time_counter"})
+
+        daOutSalt             = xr.concat(daListSalt3D,dim="time_counter")
+        daOutSalt             = daOutSalt * saltConversion
+        if transectType == "sn":
+            daOutSalt = daOutSalt.assign_attrs({"units":"10^9 Kg/s","coordinates":"time_counter depthu nav_lat"})     
+        if transectType == "we":
+            daOutSalt = daOutSalt.assign_attrs({"units":"10^9 Kg/s","coordinates":"time_counter depthv nav_lon"})     
+
+        # populate dataset
+        dsOut["salt_transport_total"]       = daOutTotalSalt
+        dsOut["salt_transport_direction1"]  = daOutDirection1Salt
+        dsOut["salt_transport_direction2"]  = daOutDirection2Salt
+        dsOut["salt_transport"]             = daOutSalt
+ 
+    if calcHeatTransp:
+        daOutTotalHeat          = xr.concat(daListTotalHeat,dim="time_counter")
+        daOutTotalHeat          = daOutTotalHeat * heatConversion 
+        daOutTotalHeat          = daOutTotalHeat.assign_attrs({"units":"10^15 Watt","coordinates":"time_counter"})
+
+        daOutDirection1Heat     = xr.concat(daListDirection1Heat,dim="time_counter")
+        daOutDirection1Heat     = daOutDirection1Heat * heatConversion 
+        daOutDirection1Heat     = daOutDirection1Heat.assign_attrs({"units":"10^15 Watt","coordinates":"time_counter"})
+
+        daOutDirection2Heat     = xr.concat(daListDirection2Heat,dim="time_counter")
+        daOutDirection2Heat     = daOutDirection2Heat * heatConversion 
+        daOutDirection2Heat     = daOutDirection2Heat.assign_attrs({"units":"10^15 Watt","coordinates":"time_counter"})
+
+        daOutHeat             = xr.concat(daListHeat3D,dim="time_counter")
+        daOutHeat             = daOutHeat * heatConversion
+        if transectType == "sn":
+            daOutHeat = daOutHeat.assign_attrs({"units":"10^15 Watt","coordinates":"time_counter depthu nav_lat"})     
+        if transectType == "we":
+            daOutHeat = daOutHeat.assign_attrs({"units":"10^15 Watt","coordinates":"time_counter depthv nav_lon"})     
+
+        # populate dataset
+        dsOut["heat_transport_total"]       = daOutTotalHeat
+        dsOut["heat_transport_direction1"]  = daOutDirection1Heat
+        dsOut["heat_transport_direction2"]  = daOutDirection2Heat
+        dsOut["heat_transport"]             = daOutHeat
+   
+    if debug:
+        with open(debugFile,"a") as f:
+            f.write("Output Dataset Population Complete\n")
 
     # add transect coordinates to output dataset
     dsCoords = xr.open_dataset(coordsPath,decode_times=False)
@@ -356,8 +620,17 @@ def main(fileList = []                  # list of files to process
     dsOut["nav_lon"] = nav_lon
     dsOut["nav_lat"] = nav_lat
 
+    # add transect type attribute
+    dsOut   = dsOut.assign_attrs({"transect_type":transectType})
+    dsOut   = dsOut.assign_attrs({"source":"NEMO Model Outputs"})
+    dsOut   = dsOut.assign_attrs({"simulation_name":simulationName})
+    dsOut   = dsOut.assign_attrs({"transect_name":transectName})
+
     # save dataset
     print("Saving Output")
+    if debug:
+        with open(debugFile,"a") as f:
+            f.write("Saving Output (the .compute() phase is long..)\n")
     #dsOut.to_netcdf(outFile)
     dsOut.compute().to_netcdf(outFile)
 
@@ -365,11 +638,21 @@ if __name__ == "__main__":
     main(fileList = fileList
         ,varName = varName
         ,transectType = transectType
+        ,transectName = transectName
         ,idxList = idxList
         ,coordsPath= coordsPath
-        ,zCoordsPath= zMeshPath
-        ,maskPath= uMaskPath
-        ,Ntasks= Ntasks
-        ,outFile= outFile
+        ,zCoordsPath= zCoordsPath
+        ,uMaskPath = uMaskPath
+        ,vMaskPath = uMaskPath
+        ,Ntasks = Ntasks
+        ,outFile = outFile
+        ,simulationName = simulationName
+        ,calcSaltTransp = calcSaltTransp
+        ,fileListS = fileListS
+        ,varNameS = varNameS
+        ,calcHeatTransp= calcHeatTransp
+        ,fileListT= fileListT
+        ,varNameT= varNameT
+        ,debug = debug
         )
 
