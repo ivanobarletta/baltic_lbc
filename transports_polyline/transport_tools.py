@@ -137,9 +137,32 @@ def calcNEMOTransport(                                  # Wrapper to the main fu
     # Do some checks on the number of segments
     transectType = "general"
     if nSegments == nSegmentsU:
+        # the polyline that approximates the transect is made only of U points (dy)
+        #  
+        #      .----.
+        # j+1  |u T |u       u*dy
+        #      .----.
+        # j    |u T |u       u*dy
+        #      .----.
+        # j-1  |u T |u       u*dy
+        #      .----.
+        #
+        #        i
+        #
+
         print("Purely Y type transect")
         transectType = "pureY"
     if nSegments == nSegmentsV:
+        # the polyline that approximates the transect is made only of V points (dx)
+        #         
+        #        v    v    v    v
+        #     .----.----.----.----.
+        #  j  |  T |  T |  T |  T |
+        #     .----.----.----.----. 
+        #       i-1   i   i+1  i+2
+        #
+        #       v*dx + v*dx ...
+        #
         print("Purely X type transect")
         transectType = "pureX"
 
@@ -156,15 +179,17 @@ def calcNEMOTransport(                                  # Wrapper to the main fu
         gphif_sel   = dsCoords["gphif"].isel(x=tgt_x_f,y=tgt_y_f).squeeze()
 
         # use extracted indices for U,V
-        tgt_y_v     = xr.DataArray(np.array([idx[0] for idx in indicesV]),dims="vpoints")
-        tgt_x_v     = xr.DataArray(np.array([idx[1] for idx in indicesV]),dims="vpoints")
-        glamv_sel   = dsCoords["glamv"].isel(x=tgt_x_v,y=tgt_y_v).squeeze()
-        gphiv_sel   = dsCoords["gphiv"].isel(x=tgt_x_v,y=tgt_y_v).squeeze()
+        if transectType != "pureY":
+            tgt_y_v     = xr.DataArray(np.array([idx[0] for idx in indicesV]),dims="vpoints")
+            tgt_x_v     = xr.DataArray(np.array([idx[1] for idx in indicesV]),dims="vpoints")
+            glamv_sel   = dsCoords["glamv"].isel(x=tgt_x_v,y=tgt_y_v).squeeze()
+            gphiv_sel   = dsCoords["gphiv"].isel(x=tgt_x_v,y=tgt_y_v).squeeze()
 
-        tgt_y_u     = xr.DataArray(np.array([idx[0] for idx in indicesU]),dims="upoints")
-        tgt_x_u     = xr.DataArray(np.array([idx[1] for idx in indicesU]),dims="upoints")
-        glamu_sel   = dsCoords["glamu"].isel(x=tgt_x_u,y=tgt_y_u).squeeze()
-        gphiu_sel   = dsCoords["gphiu"].isel(x=tgt_x_u,y=tgt_y_u).squeeze()
+        if transectType != "pureX":
+            tgt_y_u     = xr.DataArray(np.array([idx[0] for idx in indicesU]),dims="upoints")
+            tgt_x_u     = xr.DataArray(np.array([idx[1] for idx in indicesU]),dims="upoints")
+            glamu_sel   = dsCoords["glamu"].isel(x=tgt_x_u,y=tgt_y_u).squeeze()
+            gphiu_sel   = dsCoords["gphiu"].isel(x=tgt_x_u,y=tgt_y_u).squeeze()
 
         fig = plt.figure()
         ax = fig.add_subplot(1, 1, 1, projection=ccrs.PlateCarree())
@@ -184,8 +209,10 @@ def calcNEMOTransport(                                  # Wrapper to the main fu
         for glam,gphi,num in zip(glamf_sel,gphif_sel,numbers):
             ax.text(glam,gphi,num,color="y",transform=ccrs.PlateCarree(),fontsize=3)
 
-        ax.scatter(glamv_sel,gphiv_sel,s=0.5,color="g")
-        ax.scatter(glamu_sel,gphiu_sel,s=0.5,color="r")   
+        if transectType != "pureY":
+            ax.scatter(glamv_sel,gphiv_sel,s=0.5,color="g")
+        if transectType != "pureX":     
+            ax.scatter(glamu_sel,gphiu_sel,s=0.5,color="r")   
 
         gl = ax.gridlines(crs=ccrs.PlateCarree(), draw_labels=True,
             linewidth=1, color='gray', alpha=0.5, linestyle='--')
@@ -238,13 +265,15 @@ def calcNEMOTransport(                                  # Wrapper to the main fu
     # yFaces = dy * dz ---> transp = yFaces * u (m**3/s)
     # xFaces = dz * dz ---> transp = xfaces * v (m**3/s)
 
-    yFacesDa = calcYFaces(indicesU=indicesU,
+    if transectType != "pureX":
+        yFacesDa = calcYFaces(indicesU=indicesU,
                dsCoords=dsCoords,
                dsMeshZ=dsMeshZ,
                dsMaskU=dsMaskU,
                verboseLevel=verboseLevel)
 
-    xFacesDa = calcXFaces(indicesV=indicesV,
+    if transectType != "pureY":
+        xFacesDa = calcXFaces(indicesV=indicesV,
                dsCoords=dsCoords,
                dsMeshZ=dsMeshZ,
                dsMaskV=dsMaskV,
@@ -264,8 +293,6 @@ def calcNEMOTransport(                                  # Wrapper to the main fu
                         verboseLevel = verboseLevel
                             )
 
-    # loop over files
-#    for ifile,(fileU,fileV) in enumerate(zip(listFileU,listFileV)):
     dates = []
     volumeTransportTotal = []
     volumeTransportDirection1 = []    
@@ -347,15 +374,113 @@ def calcNEMOTransport(                                  # Wrapper to the main fu
                 heatTransportTotal.append(heatTransp0)
 
     if transectType == "pureX":
-        # to be implemented     
-        print("Transect Type is PureX - NOT IMPLEMETED!!!!")
-        sys.exit()
-        pass
+        for ifile,(fileU,fileV,fileS,fileT) in enumerate(zip(listFileU,listFileV,listFileS,listFileT)):  
+            if verboseLevel>0:
+                print("##########################")
+                print("ifile: ",ifile)
+                print("fileV: %s" % fileV)
+            daV_sel = loadNEMOvVelocity(pathV=fileV,indicesV=indicesV)
+            if verboseLevel>0:
+                print(daV_sel.sizes)
+            if verboseLevel>3:
+                print(" ------ daV_sel ------")
+                print(daV_sel)
+
+            vTransp = xFacesDa.values * daV_sel.values * signsV # (Z,nVpoints)
+            if verboseLevel>1:
+                print("vTransp.shape:", vTransp.shape)
+            vTransp0    = np.nansum(vTransp) * volumeConversion  
+            volTransp0  =  vTransp0
+            if verboseLevel>1:
+                print("vTransp0: ", vTransp0)
+            # direction 1 (>=0)
+            vTransp0_direction1 = np.nansum(vTransp[vTransp>=0]) * volumeConversion
+            volTransp0_dir1     = vTransp0_direction1
+            # direction 2 (<0)
+            vTransp0_direction2 = np.nansum(vTransp[vTransp<0]) * volumeConversion
+            volTransp0_dir2     = vTransp0_direction2
+
+            # horizontal sum of transport: sum_U (uTransp(z,nUpoints)) -->  uTransp(z)
+            vTranspZ    = np.nansum(vTransp,axis=1) * volumeConversion
+            volTranspZ  = vTranspZ        # (z)
+
+            # store informations in lists
+            dates.append(daU_sel["time_counter"].values)
+            volumeTransportTotal.append(volTransp0)
+            volumeTransportDirection1.append(volTransp0_dir1)
+            volumeTransportDirection2.append(volTransp0_dir2)
+            volumeTransportZ.append(volTranspZ)
+
+            if computeS:
+                print("  fileS: %s " % fileS)
+                daTV_sel        = loadNEMOvTracer(pathT=fileS,varName=varNameS,indicesV=indicesV)
+                vSaltTransp     = vTransp * daTV_sel.values # (Z,nVpoints)
+                vSaltTransp0    = rhoWater * np.nansum(vSaltTransp) * 1e-12 
+                saltTransp0     = vSaltTransp0
+                saltTransportTotal.append(saltTransp0)
+
+            if computeH:
+                print("  fileT: %s " % fileS)
+                daTV_sel        = loadNEMOvTracer(pathT=fileT,varName=varNameT,indicesV=indicesV)
+                vHeatTransp     = rhoWater * cpWater * vTransp * (daTV_sel.values - tempRef )   # (Z,nVpoints)
+                vHeatTransp0    = np.nansum(vHeatTransp) * 1e-15 
+                heatTransp0     = vHeatTransp0
+                heatTransportTotal.append(heatTransp0)
+
     if transectType == "pureY":
         # to be implemented
-        print("Transect Type is PureY - NOT IMPLEMETED!!!!")
-        sys.exit()
-        pass
+        for ifile,(fileU,fileV,fileS,fileT) in enumerate(zip(listFileU,listFileV,listFileS,listFileT)):  
+            if verboseLevel>0:
+                print("##########################")
+                print("ifile: ",ifile)
+                print("fileU: %s" % fileU)
+            daU_sel = loadNEMOuVelocity(pathU=fileU,indicesU=indicesU)
+            if verboseLevel>0:
+                print(daU_sel.sizes)
+            if verboseLevel>3:
+                print(" ------ daU_sel ------")
+                print(daU_sel)
+
+            uTransp = yFacesDa.values * daU_sel.values * signsU # (Z,nUpoints)
+            if verboseLevel>1:
+                print("uTransp.shape:", uTransp.shape)
+            uTransp0    = np.nansum(uTransp) * volumeConversion        # 0 because now is 0-dimension
+            volTransp0  = uTransp0 
+            if verboseLevel>1:
+                print("uTransp0: ", uTransp0)
+            # direction 1 (>=0)
+            uTransp0_direction1 = np.nansum(uTransp[uTransp>=0]) * volumeConversion
+            volTransp0_dir1     = uTransp0_direction1
+            # direction 2 (<0)
+            uTransp0_direction2 = np.nansum(uTransp[uTransp<0]) * volumeConversion    
+            volTransp0_dir2     = uTransp0_direction2 
+
+            # horizontal sum of transport: sum_U (uTransp(z,nUpoints)) -->  uTransp(z)
+            uTranspZ    = np.nansum(uTransp,axis=1) * volumeConversion
+            volTranspZ  = uTranspZ         # (z)
+
+            # store informations in lists
+            dates.append(daU_sel["time_counter"].values)
+            volumeTransportTotal.append(volTransp0)
+            volumeTransportDirection1.append(volTransp0_dir1)
+            volumeTransportDirection2.append(volTransp0_dir2)
+            volumeTransportZ.append(volTranspZ)
+
+            if computeS:
+                print("  fileS: %s " % fileS)
+                daTU_sel        = loadNEMOuTracer(pathT=fileS,varName=varNameS,indicesU=indicesU)
+                uSaltTransp     = uTransp * daTU_sel.values # (Z,nUpoints) 
+                uSaltTransp0    = rhoWater * np.nansum(uSaltTransp) * 1e-12     # to have units of 10^9 kg/s
+                saltTransp0     = uSaltTransp0
+                saltTransportTotal.append(saltTransp0)
+
+            if computeH:
+                print("  fileT: %s " % fileS)
+                daTU_sel        = loadNEMOuTracer(pathT=fileT,varName=varNameT,indicesU=indicesU)
+                uHeatTransp     = rhoWater * cpWater * uTransp * (daTU_sel.values - tempRef )   # (Z,nUpoints) 
+                uHeatTransp0    = np.nansum(uHeatTransp) * 1e-15     # to have units of 10^15 Watts
+                heatTransp0     = uHeatTransp0 
+                heatTransportTotal.append(heatTransp0)
 
     # create Output DataArray
     outFile     = outFileRoot % transectName
@@ -591,6 +716,8 @@ def loadNEMOuVelocity(
     if len(indicesU) == 1:
         daU_sel = daU_sel.expand_dims(dim={"upoints":1},axis=1)
 
+    dsU.close()
+
     return daU_sel
 
 def loadNEMOvVelocity(
@@ -618,6 +745,8 @@ def loadNEMOvVelocity(
 
     if len(indicesV) == 1:
         daV_sel = daV_sel.expand_dims(dim={"vpoints":1},axis=1)
+
+    dsV.close()
 
     return daV_sel
 
@@ -675,6 +804,8 @@ def loadNEMOuTracer(
 
     # replace data
     daTU_sel.data = 0.5 * (daTU_sel.data + daTU_sel_ip1.data)
+
+    dsT.close()
 
     return daTU_sel
 
@@ -744,5 +875,7 @@ def loadNEMOvTracer(
             
     # replace data
     daTV_sel.data = 0.5 * (daTV_sel.data + daTV_sel_jp1.data)
+
+    dsT.close()
 
     return daTV_sel
