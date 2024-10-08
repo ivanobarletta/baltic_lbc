@@ -318,8 +318,8 @@ def extract_uv_indices(indicesF=[],verboseLevel=False):
 
     if verboseLevel>0:
         print("extract_uv_indices:")
-        print("nSegmentsU: " ,nSegmentsU )
-        print("nSegmentsV: " ,nSegmentsV )
+        print("    nSegmentsU: " ,nSegmentsU )
+        print("    nSegmentsV: " ,nSegmentsV )
 
     return indicesV,indicesU
 
@@ -347,6 +347,8 @@ def calc_signs(
     signsV = []
 
 
+#       Numbering of a single cell 
+#
 #               (positive normal for v)    
 #                    ^     
 #                    |   
@@ -365,6 +367,21 @@ def calc_signs(
 #         i-1                  i
 #
 
+#        Transect line. Transports is considered positive
+#        90deg clockwise with respect P1-P2 direction      
+#               
+#                        . P2   
+#                       /
+#                      /   --> positive transport 
+#                     /   
+#                    /
+#                   /
+#                  /
+#                 /
+#                /
+#               /
+#              / 
+#             .  P1
 
     # P1-P2 segment of transect line
 
