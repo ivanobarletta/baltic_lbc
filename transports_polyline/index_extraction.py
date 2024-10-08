@@ -213,7 +213,7 @@ def extract_f_indices(
 
     # the loop should last until the idx_end is found
     prevIdx = startIdx
-    prevDirection = "w"
+    prevDirection = "e"
 
     indices = []
     indices.append(startIdx)
@@ -340,8 +340,8 @@ def calc_signs(
     if verboseLevel>0:
         print("calc_signs: calculate signs of segments")
 
-    if len(indicesU) == 0:
-        raise Exception("Error: calc_signs: input list has 0 length")
+    if len(indicesU) == 0 and len(indicesV) == 0:
+        raise Exception("Error: calc_signs: both input lists have 0 length")
 
     signsU = []
     signsV = []
