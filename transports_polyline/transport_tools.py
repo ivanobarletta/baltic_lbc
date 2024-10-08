@@ -166,6 +166,8 @@ def calcNEMOTransport(                                  # Wrapper to the main fu
         print("Purely X type transect")
         transectType = "pureX"
 
+
+
     if makePlot:
         print("making plot")
         import matplotlib.pyplot as plt
@@ -225,7 +227,6 @@ def calcNEMOTransport(                                  # Wrapper to the main fu
         plt.savefig("polyline_%s" % transectName,dpi=600,bbox_inches="tight")
         plt.show()
 
-
     # create list of files
     listFileU = sorted(glob(pathU))
     listFileV = sorted(glob(pathV))
@@ -280,7 +281,8 @@ def calcNEMOTransport(                                  # Wrapper to the main fu
                verboseLevel=verboseLevel)
 
     # calculate signs of segments depending on orientation
-    # with respect to transect
+    # with respect to transect 
+    # in case of pureX (pureY) signsV (signsU) is empty
     signsU, signsV = calc_signs(
                         indicesU = indicesU,
                         indicesV = indicesV,
@@ -405,7 +407,7 @@ def calcNEMOTransport(                                  # Wrapper to the main fu
             volTranspZ  = vTranspZ        # (z)
 
             # store informations in lists
-            dates.append(daU_sel["time_counter"].values)
+            dates.append(daV_sel["time_counter"].values)
             volumeTransportTotal.append(volTransp0)
             volumeTransportDirection1.append(volTransp0_dir1)
             volumeTransportDirection2.append(volTransp0_dir2)
@@ -484,8 +486,11 @@ def calcNEMOTransport(                                  # Wrapper to the main fu
 
     # create Output DataArray
     outFile     = outFileRoot % transectName
-    datesArray  = np.array(dates) 
-    depthArray  = yFacesDa["Z"].values
+    datesArray  = np.array(dates)
+    try: 
+        depthArray  = yFacesDa["Z"].values
+    except:
+        depthArray  = xFacesDa["Z"].values
 
     # save Timeseries (time)
     daVolumeTransportTotal      = xr.DataArray(data = np.array(volumeTransportTotal),coords={"time":datesArray})
