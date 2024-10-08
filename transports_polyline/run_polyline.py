@@ -46,9 +46,6 @@ P2 = (12.30,54.20 )
 
 
 
-transectName = "EAST2"
-P1 = (13.46,54.43)
-P2 = (13.93,55.49)
 
 
 
@@ -66,13 +63,9 @@ transectName = "DARSS_rev"
 P1 = (12.30,54.20) 
 P2 = (12.00,54.80)
 
-
-
-
 transectName = "SOUND"
 P1 = (12.50,55.85)
 P2 = (12.95,55.85)
-
 
 transectName = "ARKONA"                 # name of transect (for outFile)
 P1 = (13.33,54.45)
@@ -81,6 +74,14 @@ P2 = (13.33,55.45)
 transectName = "SKAGERRAK"
 P1 = (10.10,57.50)  
 P2 = (10.10,59.15)  
+
+transectName = "EAST2_purey"
+P1 = (13.46  ,54.43)
+P2 = (13.9323,55.4612)
+
+transectName = "SOUND_purex"
+P1 = (12.4877 ,55.84082 )
+P2 = (12.97403,55.763903)
 
 
 root            = "/mnt/lustre/scratch/nlsas/home/empresa/nrd/NRD/STORE/BALMFC_PRODUCTS/LBC_4NEATL/TESTRUN2_run_outs/ZNB_native_mesh/"
@@ -91,17 +92,18 @@ pathCoords2D    = rootStatic + "coordinates_NEATL36_ZNB.nc"                     
 pathZMesh       = rootStatic + "mesh_mask_testrun2_ZNB.nc"                                  # path of file with vertical scale factors   #e3t
 pathMaskU       = rootStatic + "mask_gridU_ZNB.nc"                
 pathMaskV       = rootStatic + "mask_gridV_ZNB.nc"                        
-outFileRoot     = "test4_out_transport_%s.nc" # outfile root
-
-pathU           = root + "NEATL36_TESTRUN_1d25h-m_3DU-uo_2021????-????????.nc_ZNB"        # path with U velocity files (you can use wildcards)
-pathV           = root + "NEATL36_TESTRUN_1d25h-m_3DV-vo_2021????-????????.nc_ZNB"        # path with V velocity files (you can use wildcards)  
-pathS           = root + "NEATL36_TESTRUN_1d25h-m_3DT-so_2021????-????????.nc_ZNB"        # path of Salinity files (you can use wildcards)
-pathT           = root + "NEATL36_TESTRUN_1d25h-m_3DT-thetao_2021????-????????.nc_ZNB"        # path of Salinity files (you can use wildcards)
+outFileRoot     = "test5_out_transport_%s.nc" # outfile root
 
 pathU           = root + "NEATL36_TESTRUN_1d25h-m_3DU-uo_20220[1-6]??-????????.nc_ZNB"        # path with U velocity files (you can use wildcards)
 pathV           = root + "NEATL36_TESTRUN_1d25h-m_3DV-vo_20220[1-6]??-????????.nc_ZNB"        # path with V velocity files (you can use wildcards)  
 pathS           = root + "NEATL36_TESTRUN_1d25h-m_3DT-so_20220[1-6]??-????????.nc_ZNB"        # path of Salinity files (you can use wildcards)
 pathT           = root + "NEATL36_TESTRUN_1d25h-m_3DT-thetao_20220[1-6]??-????????.nc_ZNB"        # path of Salinity files (you can use wildcards)
+
+
+pathU           = root + "NEATL36_TESTRUN_1d25h-m_3DU-uo_2021????-????????.nc_ZNB"        # path with U velocity files (you can use wildcards)
+pathV           = root + "NEATL36_TESTRUN_1d25h-m_3DV-vo_2021????-????????.nc_ZNB"        # path with V velocity files (you can use wildcards)  
+pathS           = root + "NEATL36_TESTRUN_1d25h-m_3DT-so_2021????-????????.nc_ZNB"        # path of Salinity files (you can use wildcards)
+pathT           = root + "NEATL36_TESTRUN_1d25h-m_3DT-thetao_2021????-????????.nc_ZNB"        # path of Salinity files (you can use wildcards)
 
 pathU           = root +     "NEATL36_TESTRUN_1d25h-m_3DU-uo_????????-????????.nc_ZNB"        # path with U velocity files (you can use wildcards)
 pathV           = root +     "NEATL36_TESTRUN_1d25h-m_3DV-vo_????????-????????.nc_ZNB"        # path with V velocity files (you can use wildcards)  
