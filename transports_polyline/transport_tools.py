@@ -10,13 +10,12 @@ def calcNEMOTransport(                                  # Wrapper to the main fu
                         P2 = (),                        # end point (lon,lat) tuple
                         resolution = 1./36,             # resolution (in Deg) of transect line (tip: multiply the mesh resolution by a factor 0.4 -> resolution = 0.4*mesh_resolution)
                         pathCoords2D = "",              # path of coordinates.nc # e1u,e2u,e1v,e2v
-                        pathZMesh = "",                 # path of file with vertical scale factors   #e3t
+                        pathMesh3D = "",                # path of file with vertical scale factors   #e3t/u/v
                         pathU = "",                     # path with U velocity files (you can use wildcards)
                         pathV = "",                     # path with V velocity files (you can use wildcards)  
                         pathS = "",                     # path of Salinity files (you can use wildcards)
                         pathT = "",                     # path of Salinity files (you can use wildcards)
-                        pathMaskU = "",                 
-                        pathMaskV = "",                        
+                        pathMask = "",                  # file containing t/u/v/f mask
                         outFileRoot = "out_transport_%.nc", # outfile root
                         transectName = "",              # name of transect (for outFile)
                         computeS = False,               # compute salinity transport (if True you must set pathS)
@@ -55,9 +54,16 @@ def calcNEMOTransport(                                  # Wrapper to the main fu
     dsCoords = xr.open_dataset(pathCoords2D,decode_times=False)
 
     # open mesh Z dataset
-    if not isfile(pathZMesh):
-        raise Exception("Error: meshZ file not existing: %s " % pathZMesh)
-    dsMeshZ = xr.open_dataset(pathZMesh)
+    if not isfile(pathMesh3D):
+        raise Exception("Error: meshZ file not existing: %s " % pathMesh3D)
+    dsMesh3D = xr.open_dataset(pathMesh3D)
+
+    # open mask dataset
+    if not isfile(pathMask):
+        raise Exception("Error: mask file not existing: %s " % pathMask)
+    dsMask = xr.open_dataset(pathMask)
+
+    """
 
     # open U mask dataset
     if not isfile(pathMaskU):
@@ -68,7 +74,8 @@ def calcNEMOTransport(                                  # Wrapper to the main fu
     if not isfile(pathMaskV):
         raise Exception("Error: maskV file not existing")
     dsMaskV = xr.open_dataset(pathMaskV)
-
+    """
+    
     # load coordinates of mesh fpoints
     lonsF   = dsCoords["glamf"].squeeze()
     latsF   = dsCoords["gphif"].squeeze()
@@ -257,7 +264,7 @@ def calcNEMOTransport(                                  # Wrapper to the main fu
         if len(listFileT) != len(listFileU):
             raise Exception("Error! number of T and U files does not match! lenT: %d - lenU: %d" % (len(listFileT),len(listFileU)))
 
-    listFileZ = sorted(glob(pathZMesh))
+    listFileZ = sorted(glob(pathMesh3D))
     if len(listFileZ) == 1:
         print("vertical mesh is assumed constant")
         constZ = True
@@ -267,18 +274,18 @@ def calcNEMOTransport(                                  # Wrapper to the main fu
     # xFaces = dz * dz ---> transp = xfaces * v (m**3/s)
 
     if transectType != "pureX":
-        yFacesDa = calcYFaces(indicesU=indicesU,
-               dsCoords=dsCoords,
-               dsMeshZ=dsMeshZ,
-               dsMaskU=dsMaskU,
-               verboseLevel=verboseLevel)
+        yFacesDa = calcYFaces(indicesU = indicesU,
+               dsCoords = dsCoords, 
+               dsMesh3D = dsMesh3D,
+               dsMask = dsMask,
+               verboseLevel = verboseLevel)
 
     if transectType != "pureY":
         xFacesDa = calcXFaces(indicesV=indicesV,
-               dsCoords=dsCoords,
-               dsMeshZ=dsMeshZ,
-               dsMaskV=dsMaskV,
-               verboseLevel=verboseLevel)
+               dsCoords = dsCoords,
+               dsMesh3D = dsMesh3D,
+               dsMask = dsMask,
+               verboseLevel = verboseLevel)
 
     # calculate signs of segments depending on orientation
     # with respect to transect 
@@ -290,7 +297,7 @@ def calcNEMOTransport(                                  # Wrapper to the main fu
                         lonsF = lonsF,
                         latsTransect = latsTransect,
                         lonsTransect = lonsTransect,
-                        dsMeshZ = dsMeshZ,
+                        dsMesh3D = dsMesh3D,
                         transectType = transectType,
                         verboseLevel = verboseLevel
                             )
@@ -552,8 +559,8 @@ def calcNEMOTransport(                                  # Wrapper to the main fu
 def calcXFaces(
                 indicesV    = [],
                 dsCoords    = xr.Dataset(),
-                dsMeshZ     = xr.Dataset(),
-                dsMaskV     = xr.Dataset(),
+                dsMesh3D     = xr.Dataset(),
+                dsMask      = xr.Dataset(),
                 verboseLevel    = 0
                ):
 
@@ -579,14 +586,14 @@ def calcXFaces(
     tgt_y_v     = xr.DataArray(np.array([idx[0] for idx in indicesV]),dims="vpoints")
     tgt_x_v     = xr.DataArray(np.array([idx[1] for idx in indicesV]),dims="vpoints")
     e1v_sel     = dsCoords["e1v"].isel(x=tgt_x_v,y=tgt_y_v).squeeze()
-    e3v_sel     = dsMeshZ["e3v_0"].isel(X=tgt_x_v,Y=tgt_y_v).squeeze()              #(Z,nUpoints)
-    maskV_sel   = dsMaskV["mask"].isel(x=tgt_x_v,y=tgt_y_v).squeeze()               #(depthu,nVpoints)
+    e3v_sel     = dsMesh3D["e3v_0"].isel(X=tgt_x_v,Y=tgt_y_v).squeeze()              #(Z,nUpoints)
+    maskV_sel   = dsMask["vmask"].isel(X=tgt_x_v,Y=tgt_y_v).squeeze()               #(depthu,nVpoints)
 
     # expand dims of e2u (nu) -> (z,nu)
     nz = e3v_sel.sizes["Z"]
     e1v_sel = e1v_sel.expand_dims(dim={"Z":nz})
 
-    maskV_sel = maskV_sel.rename({"depthv":"Z"})
+    #maskV_sel = maskV_sel.rename({"depthv":"Z"})
 
     if verboseLevel > 0:
         print("-- e1v_sel --")        
@@ -605,7 +612,10 @@ def calcXFaces(
     xFacesDa = xr.DataArray(xFaces,dims=["Z","vpoints"])
 
     # add informations on depth
-    xFacesDa = xFacesDa.assign_coords({"Z":maskV_sel["Z"]})
+    # Note. I use max(gdept_0.sum(dim=["X","Y"])) instead of just gdept_1d because
+    # SIREN fills only the first values of gdept_1d, the rest of values are 0. 
+    # I don't know why
+    xFacesDa = xFacesDa.assign_coords({"Z":dsMesh3D["gdept_0"].max(dim=["X","Y"])})
 
     if verboseLevel > 1:
         print("---- xFaces shape ----")        
@@ -616,8 +626,8 @@ def calcXFaces(
 def calcYFaces(
                 indicesU    = [],
                 dsCoords    = xr.Dataset(),
-                dsMeshZ     = xr.Dataset(),
-                dsMaskU     = xr.Dataset(),
+                dsMesh3D    = xr.Dataset(),
+                dsMask      = xr.Dataset(),
                 verboseLevel     = False
                ):
 
@@ -640,14 +650,14 @@ def calcYFaces(
     tgt_x_u     = xr.DataArray(np.array([idx[1] for idx in indicesU]),dims="upoints")
     # extract Arrays 
     e2u_sel     = dsCoords["e2u"].isel(x=tgt_x_u,y=tgt_y_u).squeeze()               #(nUpoints)
-    e3u_sel     = dsMeshZ["e3u_0"].isel(X=tgt_x_u,Y=tgt_y_u).squeeze()              #(Z,nUpoints)
-    maskU_sel   = dsMaskU["mask"].isel(x=tgt_x_u,y=tgt_y_u).squeeze()               #(depthu,nUpoints)
+    e3u_sel     = dsMesh3D["e3u_0"].isel(X=tgt_x_u,Y=tgt_y_u).squeeze()              #(Z,nUpoints)
+    maskU_sel   = dsMask["umask"].isel(X=tgt_x_u,Y=tgt_y_u).squeeze()               #(depthu,nUpoints)
 
     # expand dims of e2u (nu) -> (z,nu)
     nz = e3u_sel.sizes["Z"]
     e2u_sel = e2u_sel.expand_dims(dim={"Z":nz})
 
-    maskU_sel = maskU_sel.rename({"depthu":"Z"})
+    #maskU_sel = maskU_sel.rename({"depthu":"Z"})
 
     if verboseLevel>1:
         print("-- e2u_sel --")        
@@ -666,7 +676,10 @@ def calcYFaces(
     yFacesDa = xr.DataArray(yFaces,dims=["Z","upoints"])
 
     # add informations on depth
-    yFacesDa = yFacesDa.assign_coords({"Z":maskU_sel["Z"]})
+    # Note. I use max(gdept_0.sum(dim=["X","Y"])) instead of just gdept_1d because
+    # SIREN fills only the first values of gdept_1d, the rest of values are 0. 
+    # I don't know why
+    yFacesDa = yFacesDa.assign_coords({"Z":dsMesh3D["gdept_0"].max(dim=["X","Y"])})
 
     if verboseLevel>1:
         print("---- yFaces shape ----")        
@@ -691,8 +704,6 @@ def calcNEMOTransportSingle(                            # calculate the transpor
     # stote U indices in DataArrays
     tgt_y_u     = xr.DataArray(np.array([idx[0] for idx in indicesU]),dims="upoints")
     tgt_x_u     = xr.DataArray(np.array([idx[1] for idx in indicesU]),dims="upoints")
-
-
 
     pass
 

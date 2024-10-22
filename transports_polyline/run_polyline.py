@@ -44,37 +44,6 @@ P2 = (12.30,54.20 )
 
 
 
-
-
-
-
-
-
-
-transectName = "GREATBELT"             # name of transect (for outFile)
-P1 = (10.70,55.35)
-P2 = (11.25,55.50)
-
-transectName = "KATTEGAT"
-P1 = (10.15,56.85) 
-P2 = (12.65,56.85)
-
-transectName = "DARSS_rev"
-P1 = (12.30,54.20) 
-P2 = (12.00,54.80)
-
-transectName = "SOUND"
-P1 = (12.50,55.85)
-P2 = (12.95,55.85)
-
-transectName = "ARKONA"                 # name of transect (for outFile)
-P1 = (13.33,54.45)
-P2 = (13.33,55.45)
-
-transectName = "SKAGERRAK"
-P1 = (10.10,57.50)  
-P2 = (10.10,59.15)  
-
 transectName = "EAST2_purey"
 P1 = (13.46  ,54.43)
 P2 = (13.9323,55.4612)
@@ -84,15 +53,54 @@ P1 = (12.4877 ,55.84082 )
 P2 = (12.97403,55.763903)
 
 
+
+
+
+
+
+
+transectName = "EAST2"
+P1 = (13.46,54.43)
+P2 = (13.93,55.49)
+
+
+
+
+
+
+transectName = "SKAGERRAK"
+P1 = (10.10,57.50)  
+P2 = (10.10,59.15)  
+
+transectName = "ARKONA"                 # name of transect (for outFile)
+P1 = (13.33,54.45)
+P2 = (13.33,55.45)
+
+transectName = "SOUND"
+P1 = (12.50,55.85)
+P2 = (12.95,55.85)
+
+transectName = "KATTEGAT"
+P1 = (10.15,56.85) 
+P2 = (12.65,56.85)
+
+transectName = "GREATBELT"             # name of transect (for outFile)
+P1 = (10.70,55.35)
+P2 = (11.25,55.50)
+
+transectName = "DARSS_rev"
+P1 = (12.30,54.20) 
+P2 = (12.00,54.80)
+
+
 root            = "/mnt/lustre/scratch/nlsas/home/empresa/nrd/NRD/STORE/BALMFC_PRODUCTS/LBC_4NEATL/TESTRUN2_run_outs/ZNB_native_mesh/"
 rootStatic      = "/mnt/lustre/scratch/nlsas/home/empresa/nrd/NRD/STORE/BALMFC_PRODUCTS/LBC_4NEATL/TESTRUN2_run_outs/ZNB_native_mesh/static/"
 
 resolution      = 0.4* (1./36)      # it's better to have resolution higher than the native mesh 
 pathCoords2D    = rootStatic + "coordinates_NEATL36_ZNB.nc"                                 # path of coordinates.nc
-pathZMesh       = rootStatic + "mesh_mask_testrun2_ZNB.nc"                                  # path of file with vertical scale factors   #e3t
-pathMaskU       = rootStatic + "mask_gridU_ZNB.nc"                
-pathMaskV       = rootStatic + "mask_gridV_ZNB.nc"                        
-outFileRoot     = "test5_out_transport_%s.nc" # outfile root
+pathMesh3D      = rootStatic + "meshmask_SIREN/mesh_zgr.nc"                                  # path of file with vertical scale factors   #e3t
+pathMask        = rootStatic + "meshmask_SIREN/mask.nc"                
+outFileRoot     = "test7_out_transport_%s.nc" # outfile root
 
 pathU           = root + "NEATL36_TESTRUN_1d25h-m_3DU-uo_20220[1-6]??-????????.nc_ZNB"        # path with U velocity files (you can use wildcards)
 pathV           = root + "NEATL36_TESTRUN_1d25h-m_3DV-vo_20220[1-6]??-????????.nc_ZNB"        # path with V velocity files (you can use wildcards)  
@@ -122,9 +130,8 @@ calcNEMOTransport(                                  # Wrapper to the main functi
                         P2 = P2,                            # end point (lon,lat) tuple
                         resolution = resolution,            # resolution (in Deg) of user-defined transect line (tip: multiply the mesh resolution by a factor 0.4 -> resolution = 0.4*mesh_resolution)
                         pathCoords2D = pathCoords2D,        # path of coordinates.nc
-                        pathZMesh = pathZMesh,              # path of file with vertical scale factors   #e3t,e3u,e3v..
-                        pathMaskU = pathMaskU,              # path of Umask file   
-                        pathMaskV = pathMaskV,              # path of Vmask file             
+                        pathMesh3D = pathMesh3D,            # path of file with vertical scale factors   #e3t,e3u,e3v..
+                        pathMask = pathMask,                # path of t,u,v,f mask file   
                         pathU = pathU,                      # path with U velocity files (you can use wildcards)
                         pathV = pathV,                      # path with V velocity files (you can use wildcards)  
                         outFileRoot = outFileRoot,          # outfile root
