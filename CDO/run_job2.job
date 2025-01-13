@@ -1,0 +1,23 @@
+#!/bin/bash
+
+#SBATCH -J NEMOLBC
+#SBATCH -o logs/logg%J.out
+#SBATCH -e logs/logg%J.err
+#SBATCH --time=00:10:00
+#SBATCH --mem=2G
+
+#module --force purge 
+module load cdo/2.3.0
+#module load nco/4.9.7
+
+arg1=$1
+arg2=$2
+arg3=$3
+
+echo "date:   ${arg1}"
+echo "file3D: ${arg2}"
+echo "fileSSH:${arg3}"
+
+#bash createNEMOLBCwithCDO3.bash ${arg1} ${arg2} ${arg3}
+bash createNEMOLBCwithCDO4.bash ${arg1} ${arg2} ${arg3}
+
