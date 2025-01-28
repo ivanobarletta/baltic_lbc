@@ -49,6 +49,9 @@ fileType="2DT"
 varName="oce"
 fileNameRoot="NEATL36_1d-m_"
 
+fileType="2DT"
+varName="oce"
+fileNameRoot="NEATL36_1d25h-m_"
 
 # create list of weeks
 for (( w = 0; w < ${nWeeks}; ++w )); do
@@ -58,8 +61,8 @@ for (( w = 0; w < ${nWeeks}; ++w )); do
 	archivePath=${rootFolder}/R${weekDate}.tar.gz
 	echo "Extracting files from: ${archivePath}"
 	# count # of files in the folder. If < 7, submit the job
-	nFiles=$(ls R${weekDate}/*${fileType}-${varName}*_ZNB | wc -l)	
-	echo "Files present in folder: $nFiles"
+	nFiles=$(ls R${weekDate}/${fileNameRoot}${fileType}-${varName}*_ZNB | wc -l)	
+	echo "Files already extraxted from archive: $nFiles"
 	if [ ${nFiles} -lt 7 ]; then
 		echo "   submitting the job to extract from archive"	
 		sbatch extract_from_archive.sh ${weekDate} ${archivePath} ${fileNameRoot} ${fileType} ${varName}
