@@ -9,12 +9,12 @@ the depths of the cells for the source and target mesh respectively.
 
 these files are used in the 3D vertical interpolation with CDO.
 
-the CDO command make vertical inrtpolation considering depths varying in the domain is  
+the CDO command make vertical inrtpolation considering varying depths in the domain is  
 
-       	        tgtcoordinate       infile1.nc         infile2.nc        outfile.nc   
+                        tgtcoordinate       infile1.nc         infile2.nc        outfile.nc   
        cdo intlevelx3d,${TARGET_DEPTH3D} ${TEMPORARY_FILE} ${SOURCE_DEPTH3D} ${TEMPORARY_FILE2}
-          (intlevel3d)		/\			            /\		
-       		        ||			            ||				
+          (intlevel3d)      /\			                        /\		
+                            ||                                  ||				
                    createDepth3DfromSIREN.py	      createDepth3DfromCMEMS.py		
 
 
@@ -24,7 +24,7 @@ file because when you do the vertical interpolation the horizontal has been
 done. So you have to remap like is done below (you can change to another remap method..)
 
 1)
-	cdo remapcon,/mnt/lustre/scratch/nlsas/home/empresa/nrd/NRD/STORE/BALMFC_PRODUCTS/LBC_4NEATL/CDO/target_hgrid2 cmems_balmfc_depths.nc balmfc_depth3D_on_NEATL36_EAST2.nc
+	cdo remapcon,/path/to/target_horizontal_grid cmems_balmfc_depths.nc balmfc_depth3D_on_NEATL36_EAST2.nc
 
 
 2) 
